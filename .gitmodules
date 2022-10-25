@@ -1,0 +1,4 @@
+[submodule "servo_tool"]
+	path = servo_tool
+	url = https://gitee.com/aidenwei1987/servo_tool.git
+	branch = rpi
