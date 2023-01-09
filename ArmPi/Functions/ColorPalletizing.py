@@ -36,7 +36,7 @@ __target_color = ('red', 'green', 'blue')
 def setTargetColor(target_color):
     global __target_color
 
-    #print("COLOR", target_color)
+    print("COLOR", target_color)
     __target_color = target_color
     return (True, ())
 
@@ -59,11 +59,14 @@ def getAreaMaxContour(contours):
 # 夹持器夹取时闭合的角度
 servo1 = 500
 
-# 初始位置
+# 初始化位置
 def initMove():
-    Board.setBusServoPulse(1, servo1 - 50, 300)
-    Board.setBusServoPulse(2, 500, 500)
-    AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+    print("初始化机械臂位置")
+    #驱动舵机
+    Board.setBusServoPulse(1, servo1 - 50, 100)
+    Board.setBusServoPulse(2, 500, 300)
+    #AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+    AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90)
 
 def setBuzzer(timer):
     Board.setBuzzer(0)
@@ -299,6 +302,7 @@ def run(img):
  
     img_copy = img.copy()
     img_h, img_w = img.shape[:2]
+    #要划线所在图像  直线起点 直线终点  颜色 线条粗细  linetype
     cv2.line(img, (0, int(img_h / 2)), (img_w, int(img_h / 2)), (0, 0, 200), 1)
     cv2.line(img, (int(img_w / 2), 0), (int(img_w / 2), img_h), (0, 0, 200), 1)
 

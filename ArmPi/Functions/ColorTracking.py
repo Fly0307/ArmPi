@@ -391,7 +391,7 @@ def run(img):
 if __name__ == '__main__':
     init()
     start()
-    __target_color = ('red', )
+    __target_color = ('green', )
     my_camera = Camera.Camera()
     my_camera.camera_open()
     while True:

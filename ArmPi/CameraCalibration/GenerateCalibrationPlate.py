@@ -2,7 +2,7 @@
 # encoding:utf-8
 import cv2
 import numpy as np
-from calibration_config import *
+from CalibrationConfig import *
 
 #生成标定棋盘, 按键盘任意键退出
 
