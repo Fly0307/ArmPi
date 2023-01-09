@@ -67,6 +67,7 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 def startMjpgServer():
     try:
         server = ThreadedHTTPServer(('', 8080), MJPG_Handler)
+        # server = ThreadedHTTPServer(('', 8082), MJPG_Handler)
         #server = ThreadingHTTPServer(('', 8080), MJPG_Handler)
         print("server started")
         server.serve_forever()

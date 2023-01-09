@@ -1,29 +1,3 @@
-vim hw_wifi.py 
-sudo systemctl restart hw_wifi.service 
-vim hw_wifi.py 
-sudo systemctl restart hw_wifi.service 
-sudo systemctl restart hw_wifi.service cd 
-cd 
-cd hiwonder-toolbox/
-vim hw_wifi.py 
-sudo systemctl restart hw_wifi.service
-vim hw_wifi.py 
-sudo systemctl restart hw_wifi.service
-cd
-cd ArmPi
-python3 ArmPi.py 
-sudo python3 ArmPi.py 
-sudo reboot 
-ls
-tree
-clear
-ls
-clear
-ls -l
-tree
-cd ArmPi
-clear
-tree
 tree -L 1
 cd ArmIK/
 ls
@@ -1998,3 +1972,29 @@ sudo python Joystick.py
 lsof -i:9030
 sudo apt install vscode
 sudo apt install code
+sudo mv armpi.service ~/Desktop/
+cd /etc/systemd/system/
+ls
+sudo code armpi.service
+sudo vim armpi.service
+git rm -r --cached ArmPi/Functions/__pycache__
+ls
+git rm -r --cached Functions/__pycache__
+ls
+sudo python ArmPi.py
+/usr/bin/python /home/pi/ArmPi/rpcrequest.py
+sudo python ArmPi.py
+tcpdump -i eth0 port 9030
+sudo apt install tcpdump
+tcpdump -i eth0 port 9030
+sudo tcpdump -i eth0 port 9030
+sudo tcpdump port 9030
+sudo tcpdump port 9030 -w result.cap
+sudo tcpdump dst port 9030 -w result.cap
+rpcinfo
+rpcinfo -p
+sudo rpcinfo
+rpcinfo localhost
+cd "/home/pi/ArmPi"
+ls
+sudo python ArmPi.py

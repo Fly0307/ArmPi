@@ -85,3 +85,4 @@ Desktop/
 *.pyc
 ArmPi/Functions/__pycache__/ColorPalletizing.cpython-37.pyc
 ArmPi/Functions/__pycache__/ColorTracking.cpython-37.pyc
+*.cap

@@ -15,6 +15,7 @@ import HiwonderSDK.Board as Board
 import Functions.Running as Running
 
 logger = logging.getLogger('cv2')
+# log输出等级设置
 logger.setLevel(logging.CRITICAL)
 
 if sys.version_info.major == 2:
@@ -44,6 +45,8 @@ def startArmPi():
         while True:
             try:
                 req, ret = QUEUE_RPC.get(False)
+                # print("request=")
+                # print(req)
                 event, params, *_ = ret
                 ret[2] = req(params)  # 执行RPC命令
                 event.set()

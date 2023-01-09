@@ -79,6 +79,7 @@ def stopFunc(tmp):
     return (True, (RunningFunc,))
 
 def heartbeatTask():
+    return
     global LastHeartbeat
     global RunningFunc
     while True:

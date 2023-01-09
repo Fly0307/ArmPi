@@ -358,16 +358,24 @@ def HaveLABAdjust():
 
 @Request.application
 def application(request):
+    '''
+    服务的主方法，handle里面的dispatcher就是代理的rpc方法，可以写多个dispatcher
+    :param request: 
+    :return: 
+    '''
     dispatcher["echo"] = lambda s: s
     dispatcher["add"] = lambda a, b: a + b
-    #print(request.data)
+    print(request.data)
     response = JSONRPCResponseManager.handle(request.data, dispatcher)
     return Response(response.json, mimetype='application/json')
 
+# 在本地主机的 9030 端口上启动服务器，并等待来自客户端的请求
 def startRPCServer():
 #    log = logging.getLogger('werkzeug')
 #    log.setLevel(logging.ERROR)
+    # run_simple('',8090,application)
     run_simple('', 9030, application)
+
 
 if __name__ == '__main__':
     startRPCServer()
