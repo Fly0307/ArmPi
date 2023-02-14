@@ -172,6 +172,7 @@ def move():
                 #如果不给出运行时间参数，则自动计算，并通过结果返回
                 set_rgb(detect_color)
                 setBuzzer(0.1)
+                print("move to world_x=%d"%(world_x) +"and world_y=%d"%(world_y))
                 result = AK.setPitchRangeMoving((world_X, world_Y, 7), -90, -90, 0)  
                 if result == False:
                     unreachable = True
@@ -323,7 +324,8 @@ def run(img):
             img_centerx, img_centery = getCenter(rect, roi, size, square_length)  # 获取木块中心坐标
              
             world_x, world_y = convertCoordinate(img_centerx, img_centery, size) #转换为现实世界坐标
-            
+            print("world_x= %d" % (world_x)+" world_y=%d" % (world_y))
+
             cv2.drawContours(img, [box], -1, range_rgb[color_area_max], 2)
             cv2.putText(img, '(' + str(world_x) + ',' + str(world_y) + ')', (min(box[0, 0], box[2, 0]), box[2, 1] - 10),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, range_rgb[color_area_max], 1) #绘制中心点

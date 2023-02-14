@@ -1,8 +1,3 @@
-cd ..
-ls
-c
-cd
-ls
 sudo halt
 ls /dev/video*
 ls
@@ -1997,4 +1992,9 @@ whereis Thonny.desktop
 whereis Thonny
 whereis thonny
 sudo /usr/bin/thonny QRcodeIdentify.py 
+sudo python ColorSorting.py
+sudo /usr/bin/thonny QRcodeIdentify.py 
+sudo python ArmPi.py 
+sudo /usr/bin/thonny QRcodeIdentify.py 
+sudo shutdown -h now
 sudo python ColorSorting.py

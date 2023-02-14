@@ -1,16 +1,16 @@
-from math import *
-import pyzbar.pyzbar as pyzbar
+import cv2
+import time
+import Camera
+import threading
 import sys
 sys.path.append('/home/pi/ArmPi/')
-from CameraCalibration.CalibrationConfig import *
-import HiwonderSDK.Board as Board
-from ArmIK.ArmMoveIK import *
 from ArmIK.Transform import *
+from ArmIK.ArmMoveIK import *
+import HiwonderSDK.Board as Board
+from CameraCalibration.CalibrationConfig import *
+from math import *
+import pyzbar.pyzbar as pyzbar
 # from LABConfig import *
-import threading
-import Camera
-import time
-import cv2
 
 
 if sys.version_info.major == 2:
@@ -168,119 +168,6 @@ world_X, world_Y = 0, 0
 # 控制机械臂移动
 
 
-# def move():
-#     global rect
-#     global _stop
-#     global get_roi
-#     global unreachable
-#     global __isRunning
-#     global detect_color
-#     global start_pick_up
-#     global rotation_angle
-#     global reachtime
-#     global catchtime
-#     global world_X, world_Y
-
-#     # 放置坐标
-
-#     while True:
-#         if __isRunning:
-#             if detect_color != 'None' and start_pick_up:  # 如果检测到方块没有移动一段时间后，开始夹取
-#                 # 移到目标位置，高度6cm, 通过返回的结果判断是否能到达指定位置
-#                 # 如果不给出运行时间参数，则自动计算，并通过结果返回
-#                 set_rgb(detect_color)  # 设置指示灯
-#                 setBuzzer(0.1)
-#                 result = AK.setPitchRangeMoving(
-#                     (placement_area[detect_color][0], placement_area[detect_color][1], 7), -90, -90, 0)
-#                 if result == False:
-#                     unreachable = True
-#                 else:
-#                     unreachable = False
-#                     reachtime = result[2]/1000
-#                     time.sleep(reachtime)  # 如果可以到达指定位置，则获取运行时间
-
-#                     if not __isRunning:
-#                         continue
-#                     servo2_angle = getAngle(
-#                         placement_area[detect_color][0], placement_area[detect_color][1], rotation_angle)  # 计算夹持器需要旋转的角度
-# #                     print((placement_area[detect_color][0], placement_area[detect_color][1])
-#                     Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
-#                     Board.setBusServoPulse(2, servo2_angle, 500)
-#                     time.sleep(0.5)
-
-#                     if not __isRunning:
-#                         continue
-#                     AK.setPitchRangeMoving(
-#                         (placement_area[detect_color][0], placement_area[detect_color][1], 1.5), -90, -90, 0, 1000)
-#                     time.sleep(1.5)
-
-#                     if not __isRunning:
-#                         continue
-#                     Board.setBusServoPulse(1, servo1, 300)  # 夹持器闭合
-#                     time.sleep(0.8)
-
-#                     if not __isRunning:
-#                         continue
-#                     Board.setBusServoPulse(2, 500, 500)
-#                     AK.setPitchRangeMoving(
-#                         (placement_area[detect_color][0], placement_area[detect_color][1], 12), -90, -90, 0, 1000)  # 机械臂抬起
-#                     time.sleep(1)
-
-#                     if not __isRunning:
-#                         continue
-#                     result = AK.setPitchRangeMoving(
-#                         (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0)
-# #                     print(result)
-# #                     print(result[2])
-#                     time.sleep(result[2]/1000)
-
-#                     if not __isRunning:
-#                         continue
-#                     servo2_angle = getAngle(
-#                         coordinate[detect_color][0], coordinate[detect_color][1], -90)
-#                     Board.setBusServoPulse(2, servo2_angle, 500)
-#                     time.sleep(0.5)
-
-#                     if not __isRunning:
-#                         continue
-#                     AK.setPitchRangeMoving(
-#                         (coordinate[detect_color][0], coordinate[detect_color][1], coordinate[detect_color][2] + 3), -90, -90, 0, 500)
-#                     time.sleep(0.5)
-
-#                     if not __isRunning:
-#                         continue
-#                     AK.setPitchRangeMoving(
-#                         (coordinate[detect_color]), -90, -90, 0, 1000)
-#                     time.sleep(0.8)
-
-#                     if not __isRunning:
-#                         continue
-#                     Board.setBusServoPulse(1, servo1 - 200, 300)  # 爪子张开  ，放下物体
-#                     time.sleep(0.8)
-
-#                     if not __isRunning:
-#                         continue
-#                     AK.setPitchRangeMoving(
-#                         (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 800)
-#                     time.sleep(0.8)
-
-#                     initMove()  # 回到初始位置
-#                     time.sleep(1.5)
-
-#                     detect_color = 'None'
-#                     get_roi = False
-#                     start_pick_up = False
-#                     set_rgb(detect_color)
-#         else:
-#             if _stop:
-#                 _stop = False
-#                 Board.setBusServoPulse(1, servo1 - 70, 300)
-#                 time.sleep(0.5)
-#                 Board.setBusServoPulse(2, 500, 500)
-#                 AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
-#                 time.sleep(1.5)
-#             time.sleep(0.01)
-
 def move():
     global rect
     global _stop
@@ -289,6 +176,7 @@ def move():
     global __isRunning
     global unreachable
     global detect_color
+    global __target_color
     global start_pick_up
     global rotation_angle
     global world_X, world_Y
@@ -296,30 +184,35 @@ def move():
     dz = 2.5
 
     while True:
+        print("detect_color 1=%s" % detect_color)
         if __isRunning:
             print("detect_color=%s" % detect_color)
             print(start_pick_up)
             if detect_color != 'None' and start_pick_up:  # 如果检测到方块没有移动一段时间后，开始夹取
                 set_rgb(detect_color)
-                setBuzzer(0.1)
+                # setBuzzer(0.1)
+                print("begin catch……")
                 reachtime = 0
                 # 高度累加
-                z = z_r
-                z_r += dz
-                if z == 2 * dz + coordinate['red'][2]:
-                    z_r = coordinate['red'][2]
-                if z == coordinate['red'][2]:
-                    move_square = True
-                    time.sleep(3)
-                    move_square = False
+                # z = z_r
+                # z_r += dz
+                # if z == 2 * dz + coordinate['red'][2]:
+                #     z_r = coordinate['red'][2]
+                # if z == coordinate['red'][2]:
+                #     move_square = True
+                #     time.sleep(3)
+                #     move_square = False
+                print("move to world_X=%d"%(world_X) +"and world_Y=%d"%(world_Y))
                 result = AK.setPitchRangeMoving(
                     (world_X, world_Y, 7), -90, -90, 0)  # 移到目标位置，高度5cm
                 if result == False:
                     unreachable = True
+                    print(result)
                 else:
                     unreachable = False
                     reachtime += result[2]/1000
                     time.sleep(result[2]/1000)
+                    print("reachtime=%d"%(reachtime))
 
                     if not __isRunning:
                         continue
@@ -332,7 +225,7 @@ def move():
                     if not __isRunning:
                         continue
                     AK.setPitchRangeMoving(
-                        (world_X, world_Y, 2), -90, -90, 0, 1000)  # 降低高度到2cm
+                        (world_X, world_Y, 1.5), -90, -90, 0, 1000)  # 降低高度到2cm
                     time.sleep(1.5)
 
                     if not __isRunning:
@@ -349,9 +242,9 @@ def move():
 
                     if not __isRunning:
                         continue
-                    AK.setPitchRangeMoving(
+                    result=AK.setPitchRangeMoving(
                         (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 1500)
-                    time.sleep(1.5)
+                    time.sleep(result[2]/1000)
 
                     if not __isRunning:
                         continue
@@ -368,8 +261,9 @@ def move():
 
                     if not __isRunning:
                         continue
-                    AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
+                    # AK.setPitchRangeMoving(
+                    #     (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
+                    AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
                     time.sleep(0.8)
 
                     if not __isRunning:
@@ -386,19 +280,20 @@ def move():
                     initMove()  # 回到初始位置
                     time.sleep(1.5)
 
-                    detect_color = 'None'
+                    detect_color = ('None')
+                    __target_color=('None')
                     get_roi = False
                     start_pick_up = False
                     set_rgb(detect_color)
         else:
             if _stop:
                 _stop = False
-                # Board.setBusServoPulse(1, servo1 - 70, 300)
-                # time.sleep(0.5)
-                # Board.setBusServoPulse(2, 500, 500)
-                # AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
-                # time.sleep(1.5)
-                initMove()
+                Board.setBusServoPulse(1, servo1 - 70, 300)
+                time.sleep(0.5)
+                Board.setBusServoPulse(2, 500, 500)
+                AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+                time.sleep(1.5)
+                # initMove()
                 time.sleep(1.5)
             time.sleep(0.01)
 
@@ -578,15 +473,15 @@ def QRcode_sort(target_color):
                         if data[0][4] == '000000004':
                             detect_color = ('blue')
                             start_pick_up = True
-                            coordinate['blue'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == 'meat':
+                            # coordinate['blue'] = (xx+2, yy+5, 12)
+                        elif data[0][4] == '1000000020':
                             detect_color = ('red')
                             start_pick_up = True
-                            coordinate['red'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == 'fruits':
+                            # coordinate['red'] = (xx+2, yy+5, 12)
+                        elif data[0][4] == '000000003':
                             detect_color = ('green')
                             start_pick_up = True
-                            coordinate['green'] = (xx+2, yy+5, 12)
+                            # coordinate['green'] = (xx+2, yy+5, 12)
                         else:
                             detect_color = ('None')
                     else:
@@ -629,9 +524,9 @@ if __name__ == '__main__':
                     img_centerx, img_centery = getCenter(
                         rect, roi, size, square_length)  # 获取木块中心坐标
 
-                    world_x, world_y = convertCoordinate(
+                    world_X, world_Y = convertCoordinate(
                         img_centerx, img_centery, size)  # 转换为现实世界坐标
-                    print("world_x= %d" % (world_x)+" world_y=%d" % (world_y))
+                    print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
                     # 框出条形码或二维码部分
                     cv2.drawContours(frame, [box], -1, (0, 255, 0), 2)
                     cv2.imshow('img', img)
@@ -642,24 +537,24 @@ if __name__ == '__main__':
                                     .5, (0, 0, 125), 2)
                         xx, yy = convertCoordinate(
                             data[0][0], data[0][1], size)
-                        print(xx, yy)
+                        # print(xx, yy)
                         # 检测到特定条形码内容时才会抓取
                         if data[0][4] == '000000004':
                             detect_color = ('blue')
                             start_pick_up = True
                             # coordinate['blue'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == 'meat':
+                        elif data[0][4] == '100000020':
                             detect_color = ('red')
                             start_pick_up = True
                             # coordinate['red'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == 'fruits':
+                        elif data[0][4] == '000000003':
                             detect_color = ('green')
                             start_pick_up = True
                             # coordinate['green'] = (xx+2, yy+5, 12)
                         else:
                             detect_color = ('None')
                     else:
-                        __target_color = ('')
+                        __target_color = ('None')
 
             # img = run(img)
             cv2.imshow('frame', frame)
