@@ -1,94 +1,3 @@
-tree -L 1
-cd ArmIK/
-ls
-cd ..
-tree ArmIK
-cd ArmPi
-ls
-tree -L 1
-tree CameraCalibration/
-cd CameraCalibration/
-ls
-tree -L 1
-cd ..
-ls
-vim Camera.py 
-vim RPCServer.py 
-vim Camera.py 
-cd ArmPi
-LS
-ls
-cd Functions/
-vim ColorTracking.py 
-sudo systemctl restart armpi.service 
-vim ColorTracking.py 
-vim ColorPalletizing.py 
-vim ColorSorting.py 
-
-sudo systemctl restart armpi.service 
-vim ColorPalletizing.py 
-cd .. 
-sudo systemctl stop armpi.service 
-python3 Armp
-python3 ArmPi.py 
-python3 Armp
-python3 ArmPi.py 
-cd ArmPi
-cd Functions/
-vim ColorPalletizing.py 
-vim Colors
-vim ColorSorting.py 
-vim ColorTracking.py 
-vim ASRControl.py 
-vim ColorPalletizing.py 
-sudo halt
-cd ArmPi
-ls
-cd Functions/
-ls
-vim ASRControl.py 
-vim ColorPalletizing.py 
-vim ColorSorting.py 
-vim ColorTracking.py 
-clear
-cd ..
-ls
-clear
-tree -L 1
-cd Functions/
-tree 
-clear
-tree -L 1
-vim ASRControl.py 
-vim Running.py 
-cd ..
-ls
-cd HiwonderSDK/
-ls
-tree -L 1
-clear
-ls
-cd ..
-ls
-cd Functions/
-cd
-ls
-clear
-sudo vim ArmPi/Functions/ColorTracking.py 
-ps -ef|grep python
-cd /etc/systemd/system/
-ls
-rm joystick.service 
-sudo rm joystick.service 
-ls
-cd
-ls
-cd .config/autostart/
-ls
-vim Hand_Joystick.desktop 
-mv Hand_Joystick.desktop Joystick.desktop 
-ls
-clear
 cd ..
 ls
 c
@@ -1998,3 +1907,94 @@ rpcinfo localhost
 cd "/home/pi/ArmPi"
 ls
 sudo python ArmPi.py
+sudo python ArmPi.py
+ls
+git rm -r --cached __pycache__/
+python rpcrequest.py
+/usr/bin/python /home/pi/ArmPi/rpcrequest.py
+# coding: utf-8
+import requests
+import json
+def main():
+if __name__ == "__main__":
+curl localhost:9030/jsonrpc  --data '{"jsonrpc":"2.0", "method":"ColorTracking", "params":["red"], "id":167325334918}'
+sudo shutdown -h now
+sudo python ArmPi.py
+pip3 install pyzbar
+pip3 show pyzbar
+/usr/bin/python /home/pi/ArmPi/Functions/Bar_code_identification.py
+sudo python Bar_code_identification.py
+sudo /usr/bin/python /home/pi/ArmPi/Functions/Bar_code_identification.py
+cd "/home/pi/ArmPi/Functions"
+cd Desktop/
+copy armpi.service /usr/lib/systemd/user
+mv armpi.service /usr/lib/systemd/user
+sudo mv armpi.service /usr/lib/systemd/user
+sudo reboot 
+sudo python ArmPi.py &
+sudo python ArmPi.py
+sudo reboot 
+cd "/home/pi"
+sudo reboot
+sudo vim hiwonder_wifi_conf.py
+sudo reboot
+sudo mv /usr/lib/systemd/user/armpi.service ./
+sudo vim hiwonder_wifi_conf.py 
+sudo reboot 
+sudo vim hiwonder_wifi_conf.py 
+sudo reboot 
+sudo vim hiwonder_wifi_conf.py
+sudo restrat
+sudo reboot
+sudo python ArmPi.py
+sudo kill -s 9 524
+ps
+top
+sudo python ArmPi.py
+find / -iname "armpi.service"
+sudo find / -iname "armpi.service"
+cd /etc/systemd/system/
+ls
+sudo rm armpi.service
+sudo reboot 
+sudo python rpcrequest.py
+sudo python ArmPi.py
+sudo python Bar_code_identification.py
+sudo pip install pyzbar
+sudo python Bar_code_identification.py
+sudo python QRcodeIdentify.py
+sudo python Bar_code_identification.py
+sudo python QRcodeIdentify.py
+sudo python Bar_code_identification.py
+/usr/bin/python -m pip install -U autopep8
+/usr/bin/python /home/pi/ArmPi/Bar_code_identification.py
+sudo python Bar_code_identification.py
+sudo shutdown
+sudo shutdown -h
+sudo shutdown -h now
+sudo vim hiwonder_wifi_conf.py
+sudo reboot
+sudo python ArmPi.py 
+sudo python Bar
+sudo python Bar_code_identification.py 
+sudo python QRcodeIdentify.py 
+sudo python ColorPalletizing.py 
+sudo python ColorPalletizing.py  blue
+sudo python3 ColorPalletizing.py
+sudo python ColorPalletizing.py
+cd ..
+cd Functions
+sudo python ColorSorting.py 
+sudo shutdown -h now
+
+sudo python QRcodeIdentify.py 
+sudo /home/pi/.local/share/applications/Thonny.desktop
+sudo /home/pi/.local/share/applications/Thonny
+sudo Thonny
+sudo Thonny QRcodeIdentify.py 
+sudo code QRcodeIdentify.py 
+whereis Thonny.desktop
+whereis Thonny
+whereis thonny
+sudo /usr/bin/thonny QRcodeIdentify.py 
+sudo python ColorSorting.py

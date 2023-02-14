@@ -1,24 +1,25 @@
 #!/usr/bin/python3
 # coding=utf8
+from Functions.ASRControl import *
+import Functions.ColorPalletizing as ColorPalletiz
+import Functions.ColorSorting as ColorSort
+import Functions.ColorTracking as ColorTrack
+import Functions.Running as Running
+import Functions.lab_adjust as lab_adjust
+import QRcodeIdentify
+import HiwonderSDK.ActionGroupControl as AGC
+import HiwonderSDK.Board as Board
+import HiwonderSDK as hwsdk
+from ArmIK.ArmMoveIK import *
+from jsonrpc import JSONRPCResponseManager, dispatcher
+from werkzeug.serving import run_simple
+from werkzeug.wrappers import Request, Response
+import threading
+import logging
+import time
 import os
 import sys
 sys.path.append('/home/pi/ArmPi/')
-import time
-import logging
-import threading
-from werkzeug.wrappers import Request, Response
-from werkzeug.serving import run_simple
-from jsonrpc import JSONRPCResponseManager, dispatcher
-from ArmIK.ArmMoveIK import *
-import HiwonderSDK as hwsdk
-import HiwonderSDK.Board as Board
-import HiwonderSDK.ActionGroupControl as AGC
-import Functions.lab_adjust as lab_adjust
-import Functions.Running as Running
-import Functions.ColorTracking as ColorTrack
-import Functions.ColorSorting as ColorSort
-import Functions.ColorPalletizing as ColorPalletiz
-from Functions.ASRControl import *
 
 if sys.version_info.major == 2:
     print('Please run this program with python3!')
@@ -34,6 +35,7 @@ HWSONAR = None
 QUEUE = None
 
 initMove()
+
 
 @dispatcher.add_method
 def SetPWMServo(*args, **kwargs):
@@ -56,6 +58,7 @@ def SetPWMServo(*args, **kwargs):
         ret = (False, __RPC_E03, 'SetPWMServo')
     return ret
 
+
 @dispatcher.add_method
 def SetBusServoPulse(*args, **kwargs):
     ret = (True, (), 'SetBusServoPulse')
@@ -67,7 +70,7 @@ def SetBusServoPulse(*args, **kwargs):
         pulses = args[3:arglen:2]
         use_times = args[0]
         for s in servos:
-           if s < 1 or s > 6:
+            if s < 1 or s > 6:
                 return (False, __RPC_E02)
         dat = zip(servos, pulses)
         for (s, p) in dat:
@@ -76,6 +79,7 @@ def SetBusServoPulse(*args, **kwargs):
         print(e)
         ret = (False, __RPC_E03, 'SetBusServoPulse')
     return ret
+
 
 @dispatcher.add_method
 def SetBusServoDeviation(*args):
@@ -90,6 +94,7 @@ def SetBusServoDeviation(*args):
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'SetBusServoDeviation')
+
 
 @dispatcher.add_method
 def GetBusServosDeviation(args):
@@ -107,7 +112,8 @@ def GetBusServosDeviation(args):
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'GetBusServosDeviation')
-    return ret 
+    return ret
+
 
 @dispatcher.add_method
 def SaveBusServosDeviation(args):
@@ -120,7 +126,8 @@ def SaveBusServosDeviation(args):
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'SaveBusServosDeviation')
-    return ret 
+    return ret
+
 
 @dispatcher.add_method
 def UnloadBusServo(args):
@@ -133,6 +140,7 @@ def UnloadBusServo(args):
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'UnloadBusServo')
+
 
 @dispatcher.add_method
 def GetBusServosPulse(args):
@@ -152,18 +160,20 @@ def GetBusServosPulse(args):
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'GetBusServosPulse')
-    return ret 
+    return ret
+
 
 @dispatcher.add_method
 def StopBusServo(args):
     ret = (True, (), 'StopBusServo')
     if args != 'stopAction':
         return (False, __RPC_E01, 'StopBusServo')
-    try:     
+    try:
         AGC.stop_action_group()
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'StopBusServo')
+
 
 @dispatcher.add_method
 def RunAction(args):
@@ -175,20 +185,23 @@ def RunAction(args):
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'RunAction')
-        
+
+
 @dispatcher.add_method
-def ArmMoveIk(*args):   
+def ArmMoveIk(*args):
     ret = (True, (), 'ArmMoveIk')
     if len(args) != 7:
         return (False, __RPC_E01, 'ArmMoveIk')
     try:
-        result = setPitchRangeMoving((args[0], args[1], args[2]), args[3], args[4], args[5], args[6])
+        result = setPitchRangeMoving(
+            (args[0], args[1], args[2]), args[3], args[4], args[5], args[6])
         ret = (True, result)
     except Exception as e:
         print(e)
         ret = (False, __RPC_E03, 'ArmMoveIk')
     return ret
-        
+
+
 @dispatcher.add_method
 def SetBrushMotor(*args, **kwargs):
     ret = (True, (), 'SetBrushMotor')
@@ -209,16 +222,18 @@ def SetBrushMotor(*args, **kwargs):
         ret = (False, __RPC_E03, 'SetBrushMotor')
     return ret
 
+
 @dispatcher.add_method
 def GetSonarDistance():
     global HWSONAR
-    
+
     ret = (True, 0, 'GetSonarDistance')
     try:
         ret = (True, HWSONAR.getDistance(), 'GetSonarDistance')
     except:
         ret = (False, __RPC_E03, 'GetSonarDistance')
     return ret
+
 
 @dispatcher.add_method
 def GetBatteryVoltage():
@@ -230,17 +245,19 @@ def GetBatteryVoltage():
         ret = (False, __RPC_E03, 'GetBatteryVoltage')
     return ret
 
+
 @dispatcher.add_method
-def SetSonarRGBMode(mode = 0):
+def SetSonarRGBMode(mode=0):
     global HWSONAR
-    
+
     HWSONAR.setRGBMode(mode)
     return (True, (mode,), 'SetSonarRGBMode')
+
 
 @dispatcher.add_method
 def SetSonarRGB(index, r, g, b):
     global HWSONAR
-    
+
     if index == 0:
         HWSONAR.setRGB(1, (r, g, b))
         HWSONAR.setRGB(2, (r, g, b))
@@ -248,19 +265,22 @@ def SetSonarRGB(index, r, g, b):
         HWSONAR.setRGB(index, (r, g, b))
     return (True, (r, g, b), 'SetSonarRGB')
 
+
 @dispatcher.add_method
 def SetSonarRGBBreathCycle(index, color, cycle):
     global HWSONAR
-    
+
     HWSONAR.setBreathCycle(index, color, cycle)
     return (True, (index, color, cycle), 'SetSonarRGBBreathCycle')
+
 
 @dispatcher.add_method
 def SetSonarRGBStartSymphony():
     global HWSONAR
-    
+
     HWSONAR.startSymphony()
     return (True, (), 'SetSonarRGBStartSymphony')
+
 
 def runbymainth(req, pas):
     if callable(req):
@@ -268,8 +288,8 @@ def runbymainth(req, pas):
         ret = [event, pas, None]
         QUEUE.put((req, ret))
         count = 0
-        #ret[2] =  req(pas)
-        #print('ret', ret)
+        # ret[2] =  req(pas)
+        # print('ret', ret)
         while ret[2] is None:
             time.sleep(0.01)
             count += 1
@@ -285,76 +305,114 @@ def runbymainth(req, pas):
     else:
         return (False, __RPC_E05)
 
+
 @dispatcher.add_method
-def SetSonarDistanceThreshold(new_threshold = 30): 
+def SetSonarDistanceThreshold(new_threshold=30):
     return runbymainth(Avoidance.setThreshold, (new_threshold,))
+
 
 @dispatcher.add_method
 def GetSonarDistanceThreshold():
     return runbymainth(Avoidance.getThreshold, ())
 
+
 @dispatcher.add_method
-def LoadFunc(new_func = 0):
+def LoadFunc(new_func=0):
     return runbymainth(Running.loadFunc, (new_func, ))
+
 
 @dispatcher.add_method
 def UnloadFunc():
     return runbymainth(Running.unloadFunc, ())
 
+
 @dispatcher.add_method
 def StartFunc():
     return runbymainth(Running.startFunc, ())
+
 
 @dispatcher.add_method
 def StopFunc():
     return runbymainth(Running.stopFunc, ())
 
+
 @dispatcher.add_method
 def FinishFunc():
     return runbymainth(Running.finishFunc, ())
+
 
 @dispatcher.add_method
 def Heartbeat():
     return runbymainth(Running.doHeartbeat, ())
 
+
 @dispatcher.add_method
 def GetRunningFunc():
-    #return runbymainth("GetRunningFunc", ())
+    # return runbymainth("GetRunningFunc", ())
     return (True, (0,))
+
+# 颜色追踪
+
 
 @dispatcher.add_method
 def ColorTracking(*target_color):
     return runbymainth(ColorTrack.setTargetColor, target_color)
+# 颜色分拣
+
 
 @dispatcher.add_method
 def ColorSorting(*target_color):
     return runbymainth(ColorSort.setTargetColor, target_color)
 
+# 智能码垛
+
+
 @dispatcher.add_method
 def ColorPalletizing(*target_color):
     return runbymainth(ColorPalletiz.setTargetColor, target_color)
+
+# 货物分拣——识别单号进行追踪分类
+
+# 识别抓取
+
+
+@dispatcher.add_method
+def CargoSorting():
+    return runbymainth(QRcodeIdentify.QRcode_sort, ())
+# 放置
+
+
+def CargoPlacement(*target_color):
+    return runbymainth(QRcodeIdentify.QRcode_sort, target_color)
+
 
 # 设置颜色阈值
 # 参数：颜色lab
 # 例如：[{'red': ((0, 0, 0), (255, 255, 255))}]
 @dispatcher.add_method
 def SetLABValue(*lab_value):
-    #print(lab_value)
+    # print(lab_value)
     return runbymainth(lab_adjust.setLABValue, lab_value)
 
 # 保存颜色阈值
+
+
 @dispatcher.add_method
 def GetLABValue():
     return (True, lab_adjust.getLABValue()[1], 'GetLABValue')
 
 # 保存颜色阈值
+
+
 @dispatcher.add_method
 def SaveLABValue(color=''):
     return runbymainth(lab_adjust.saveLABValue, (color, ))
 
+
 @dispatcher.add_method
 def HaveLABAdjust():
     return (True, True, 'HaveLABAdjust')
+
 
 @Request.application
 def application(request):
@@ -370,9 +428,11 @@ def application(request):
     return Response(response.json, mimetype='application/json')
 
 # 在本地主机的 9030 端口上启动服务器，并等待来自客户端的请求
+
+
 def startRPCServer():
-#    log = logging.getLogger('werkzeug')
-#    log.setLevel(logging.ERROR)
+    #    log = logging.getLogger('werkzeug')
+    #    log.setLevel(logging.ERROR)
     # run_simple('',8090,application)
     run_simple('', 9030, application)
 
