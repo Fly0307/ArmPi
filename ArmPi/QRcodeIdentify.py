@@ -39,7 +39,7 @@ coordinate = {
     'blue':  (-15 + 0.5, 0 - 0.5,  2),
 }
 
-__target_color = ('red')
+__target_color = ('None')
 # 设置检测颜色
 
 
@@ -254,6 +254,9 @@ def move():
                         (world_X, world_Y, 12), -90, -90, 0, 1000)  # 机械臂抬起
                     time.sleep(1)
                     start_pick_up=False
+                    #预运动到码垛区上方
+                    AK.setPitchRangeMoving(
+                        (-15 + 0.5, 6, 12), -90, -90, 0, 1000)  # 机械臂抬起
                     print("机械臂抬起")
 
             if detect_color!='None'and start_pick_down:
@@ -485,16 +488,32 @@ def get_worldposition():
 
 # target_color,暂时用颜色代替地址
 def get_text():
-    global start_pick_up
+    global __target_color
     global text
+    global start_pick_up
+    global start_pick_down
+    __target_color=__target_color
     print('func get_text() started')
-    if text!='':
-        start_pick_up=True
-        return (True, (text))
+    return (True,(text))
+
+def setTargetColor(target_color):
+    global __target_color
+    global text
+    global start_pick_up
+    global start_pick_down
+    print('func setTargetColor() started')
+    if target_color=='None':
+        return (True,(text))
     else:
-        start_pick_up=False
-        return (True,(''))
+        # print("COLOR", target_color)
+        __target_color = target_color
+        if text!='null':
+            start_pick_down=True
+        else:
+            start_pick_down=False
+        return (True, (text))
     
+
 def QRcode_sort():
     print('func QRcode_sort() started')
     global detect_color
@@ -566,19 +585,7 @@ def QRcode_sort():
             #     # 如果采用预抓取则不需要返回方块位置
             #     return 'None'
 
-def setTargetColor(target_color):
-    global __target_color
-    global text
-    global start_pick_up
-    global start_pick_down
-    print('func setTargetColor() started')
-    print("COLOR", target_color)
-    __target_color = target_color
-    if text!='null':
-        start_pick_down=True
-    else:
-        start_pick_down=False
-    return (True, (text))
+
 
     
 

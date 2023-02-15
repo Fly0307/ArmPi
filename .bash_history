@@ -1,28 +1,3 @@
-cd ArmPi
-python3 ArmPi.py 
-cd CameraCalibration/
-LS
-ls
-python3 Calibration.py 
-ls
-python3 GetMapParam.py 
-vim GetMapParam.py 
-cd ..
-cd Functions/
-vim Running.py
-sudo systemctl stop armpi.service 
-cd ArmPi
-ls
-cd Functions/
-python3 ColorTracking.py 
-vim ColorSorting.py 
-python3 ColorSorting.py 
-vim ColorSorting.py 
-python3 ColorSorting.py 
-vim ColorSorting.py 
-cd ..
-python3 ArmPi.py 
-vim ColorSorting.py 
 python3 ArmPi.py 
 sudo systemctl stop armpi.service 
 ls
@@ -1998,3 +1973,28 @@ sudo python ArmPi.py
 top
 clear
 sudo python ArmPi.py 
+cd /home/
+ls
+cd pi/ArmPi
+ls
+clear
+sudo python ArmPi.py 
+tail -n 5 text.log
+tail -n 10 text.log
+less -n 10 text.log
+tail -fn 10 text.log
+tail -n10 -f text.log
+clear
+sudo python ArmPi.py 
+sudo python ArmPi.py > text.log
+sudo python ArmPi.py 
+sudo python ArmPi.py > text.log
+git push origin2
+clear
+sudo python ArmPi.py > text.log
+tail -n10 -f text.log
+clear
+cd /home/pi/ArmPi/
+ls
+tail -n10 -f text.log
+sudo reboot
