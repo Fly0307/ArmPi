@@ -1,32 +1,3 @@
-vim Camera.py 
-sudo systemctl restart armpi.service 
-sudo systemctl stop armpi.service 
-cd Functions/
-ls
-CD ..
-cd ..
-sudo python3 ArmPi.py 
-vim Camera.py 
-sudo python3 ArmPi.py 
-sudo systemctl start armpi.service 
-sudo python3 ArmPi.py 
-clear
-ls
-sudo systemctl stop armpi.service 
-ls
-cd Functions/
-ls
-python3 ColorTracking.py 
-vim ColorTracking.py 
-sudo python3  ColorTracking.py 
-vim ColorTracking.py 
-sudo python3  ColorTracking.py 
-sduo halt
-sudo halt
-ls
-cd /boot/
-ls
-vim hiwonder_wifi_conf.py 
 cd ArmPi
 python3 ArmPi.py 
 cd CameraCalibration/
@@ -1998,3 +1969,32 @@ sudo shutdown -h now
 sudo python QRcodeIdentify.py 
 sudo python Bar_code_identification.py 
 sudo python QRcodeIdentify.py 
+sudo python ArmPi.py 
+ssh-keygen -t rsa -C 'fly0307@sjtu.edu.cn'
+git push origin2
+git config
+git config --get-all
+git config --global
+git config--global
+git config --get-all 
+git config --get-all -l
+git config --global user.name 'fly0307'
+git config --global user.password '20001201.zx'
+git push origin2
+git remote -a
+git remote -v
+git push origin2
+git remote set-url origin2 git@github.com:Fly0307/ArmPi.git
+git remote -v
+git push origin2
+sudo python ArmPi.py 
+clear
+sudo python ArmPi.py 
+clear
+sudo python ArmPi.py 
+clear
+sudo python ArmPi.py 
+sudo python ArmPi.py
+top
+clear
+sudo python ArmPi.py 

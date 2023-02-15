@@ -290,6 +290,7 @@ def runbymainth(req, pas):
         count = 0
         # ret[2] =  req(pas)
         # print('ret', ret)
+        #2s以上未返回则超时
         while ret[2] is None:
             time.sleep(0.01)
             count += 1
@@ -378,10 +379,9 @@ def ColorPalletizing(*target_color):
 
 @dispatcher.add_method
 def CargoSorting():
-    return runbymainth(QRcodeIdentify.setTargetColor, ('None'))
+    return runbymainth(QRcodeIdentify.get_text, ())
+
 # 放置
-
-
 def CargoPlacement(*target_color):
     return runbymainth(QRcodeIdentify.setTargetColor, target_color)
 
