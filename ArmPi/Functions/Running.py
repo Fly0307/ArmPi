@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # coding=utf8
 import sys
+sys.path.append('/home/pi/ArmPi/')
 import time
 import threading
 import Functions.lab_adjust as lab_adjust
@@ -10,6 +11,7 @@ import Functions.ColorSorting as ColorSorting
 import Functions.RemoteControl as RemoteControl
 import Functions.ColorTracking as ColorTracking
 import Functions.ColorPalletizing as ColorPalletizing
+import QRcodeIdentify
 
 RunningFunc = 0
 LastHeartbeat = 0
@@ -22,7 +24,7 @@ FUNCTIONS = {
     4: ColorPalletizing, # 智能码垛
     5: ASRControl,       # 语音控制
     6: Calibrating,      # 位置校准
-    7: None,
+    7: QRcodeIdentify,
     8: None,
     9: lab_adjust        # lab校准 
 }

@@ -378,12 +378,12 @@ def ColorPalletizing(*target_color):
 
 @dispatcher.add_method
 def CargoSorting():
-    return runbymainth(QRcodeIdentify.QRcode_sort, ())
+    return runbymainth(QRcodeIdentify.setTargetColor, ('None'))
 # 放置
 
 
 def CargoPlacement(*target_color):
-    return runbymainth(QRcodeIdentify.QRcode_sort, target_color)
+    return runbymainth(QRcodeIdentify.setTargetColor, target_color)
 
 
 # 设置颜色阈值

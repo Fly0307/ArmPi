@@ -39,7 +39,7 @@ def setTargetColor(target_color):
 
     #print("COLOR", target_color)
     __target_color = target_color
-    return (True, ())
+    return (True, ("success"))
 
 # 找出面积最大的轮廓
 # 参数为要比较的轮廓的列表

@@ -1,6 +1,3 @@
-clear
-python3 ColorPalletizing.py 
-cd ..
 vim Camera.py 
 sudo systemctl restart armpi.service 
 sudo systemctl stop armpi.service 
@@ -1998,3 +1995,6 @@ cd ..
 sudo python QRcodeIdentify.py 
 sudo python QRcodeIdentify.py > test.log
 sudo shutdown -h now
+sudo python QRcodeIdentify.py 
+sudo python Bar_code_identification.py 
+sudo python QRcodeIdentify.py 
