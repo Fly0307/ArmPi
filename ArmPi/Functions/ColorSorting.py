@@ -172,7 +172,7 @@ def move():
                 #如果不给出运行时间参数，则自动计算，并通过结果返回
                 set_rgb(detect_color)
                 setBuzzer(0.1)
-                print("move to world_x=%d"%(world_x) +"and world_y=%d"%(world_y))
+                print("move to world_x=%d"%(world_X) +"and world_y=%d"%(world_Y))
                 result = AK.setPitchRangeMoving((world_X, world_Y, 7), -90, -90, 0)  
                 if result == False:
                     unreachable = True

@@ -34,9 +34,9 @@ placement_area = {
     'blue':  (-15 + 0.5, 0 - 0.5,  1.5),
 }
 coordinate = {
-    'red':   (-15 + 0.5, 12 - 0.5, 1.5),
-    'green': (-15 + 0.5, 6 - 0.5,  1.5),
-    'blue':  (-15 + 0.5, 0 - 0.5,  1.5),
+    'red':   (-15 + 0.5, 12 - 0.5, 2),
+    'green': (-15 + 0.5, 6 - 0.5,  2),
+    'blue':  (-15 + 0.5, 0 - 0.5,  2),
 }
 
 __target_color = ('red')
@@ -58,8 +58,10 @@ servo1 = 500
 
 
 def initMove():
-    n = 10
-    count = [0] * n
+    global count
+    count = {'red':   0,
+    'green': 0,
+    'blue':  0,}
     Board.setBusServoPulse(1, servo1 - 50, 300)
     Board.setBusServoPulse(2, 500, 500)
     AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
@@ -93,7 +95,9 @@ def set_rgb(color):
         Board.RGB.show()
 
 
-count = []  # 放置高度计数
+count = {'red':   0,
+    'green': 0,
+    'blue':  0,}  # 放置高度计数
 _stop = False
 color_list = []
 get_roi = False
@@ -115,7 +119,9 @@ def reset():
     global start_count_t1
     global z_r, z_g, z_b, z
 
-    count = 0
+    count = count = {'red':   0,
+    'green': 0,
+    'blue':  0,} 
     _stop = False
     color_list = []
     get_roi = False
@@ -177,6 +183,7 @@ def move():
     global unreachable
     global detect_color
     global __target_color
+    global count
     global start_pick_up
     global rotation_angle
     global world_X, world_Y
@@ -194,7 +201,7 @@ def move():
                 print("begin catch……")
                 reachtime = 0
                 # 高度累加
-                # z = z_r
+                z = coordinate[detect_color][2]
                 # z_r += dz
                 # if z == 2 * dz + coordinate['red'][2]:
                 #     z_r = coordinate['red'][2]
@@ -256,19 +263,22 @@ def move():
                     if not __isRunning:
                         continue
                     AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], z + 3), -90, -90, 0, 500)
+                        (coordinate[detect_color][0], coordinate[detect_color][1], z + count[detect_color]*3), -90, -90, 0, 500)
                     time.sleep(0.5)
 
                     if not __isRunning:
                         continue
                     # AK.setPitchRangeMoving(
                     #     (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
-                    AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
-                    time.sleep(0.8)
+                    # AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
+                    # time.sleep(0.8)
 
                     if not __isRunning:
                         continue
                     Board.setBusServoPulse(1, servo1 - 200, 500)  # 爪子张开  ，放下物体
+                    n=count[detect_color]
+                    count[detect_color]=n+1
+                    print("num %s"%(detect_color)+"=%d"%(n+1))
                     time.sleep(1)
 
                     if not __isRunning:

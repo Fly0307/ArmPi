@@ -1,12 +1,3 @@
-sudo halt
-ls /dev/video*
-ls
-cd F
-cd ArmPi
-cd Functions/
-python3 Calibrating.py 
-python3 ColorPalletizing.py 
-python3 Calibrating.py 
 clear
 python3 ColorPalletizing.py 
 cd ..
@@ -1998,3 +1989,12 @@ sudo python ArmPi.py
 sudo /usr/bin/thonny QRcodeIdentify.py 
 sudo shutdown -h now
 sudo python ColorSorting.py
+sudo /usr/bin/thonny QRcodeIdentify.py 
+sudo python QRcodeIdentify.py 
+sudo python QRcodeIdentify.py
+sudo python QRcodeIdentify.py 
+/usr/bin/python3 /home/pi/ArmPi/pythontest.py
+cd ..
+sudo python QRcodeIdentify.py 
+sudo python QRcodeIdentify.py > test.log
+sudo shutdown -h now
