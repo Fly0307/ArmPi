@@ -382,9 +382,9 @@ def CargoSorting():
     return runbymainth(QRcodeIdentify.get_text, ())
 
 # 放置
-def CargoPlacement(*target_color):
-    return runbymainth(QRcodeIdentify.setTargetColor, target_color)
-
+@dispatcher.add_method
+def CargoPlacement():
+    return runbymainth(QRcodeIdentify.setTargetColor, ('None'))
 
 # 设置颜色阈值
 # 参数：颜色lab

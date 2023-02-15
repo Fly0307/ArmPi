@@ -43,14 +43,6 @@ __target_color = ('red')
 # 设置检测颜色
 
 
-def setTargetColor(target_color):
-    global __target_color
-
-    print("COLOR", target_color)
-    __target_color = target_color
-    return (True, ())
-
-
 # 夹持器夹取时闭合的角度
 servo1 = 500
 
@@ -128,6 +120,7 @@ def reset():
     __target_color = 'None'
     detect_color = 'None'
     start_pick_up = False
+    start_pick_down = False
     start_count_t1 = True
     z_r = coordinate['red'][2]
     z_g = coordinate['green'][2]
@@ -169,6 +162,7 @@ rotation_angle = 0
 unreachable = False  # 判断是否能够抓取
 reachtime = 0  # 抵达指定位置的时间
 catchtime = 0  # 抓取的时间
+text='null'
 world_X, world_Y = 0, 0
 
 # 控制机械臂移动
@@ -184,7 +178,9 @@ def move():
     global detect_color
     global __target_color
     global count
+    global text
     global start_pick_up
+    global start_pick_down
     global rotation_angle
     global world_X, world_Y
     global z_r, z_g, z_b, z
@@ -195,11 +191,23 @@ def move():
         if __isRunning:
             # print("detect_color=%s" % detect_color)
             # print(start_pick_up)
+            # 检测到特定二维码内容时才会抓取
+            if text == '000000004':
+                detect_color = ('blue')
+                # start_pick_up = True
+            elif text == '100000020':
+                detect_color = ('red')
+                # start_pick_up = True
+            elif text == '000000003':
+                detect_color = ('green')
+                # start_pick_up = True
+            else:
+                detect_color = 'None'
             if detect_color != 'None' and start_pick_up:  # 如果检测到方块没有移动一段时间后，开始夹取
                 set_rgb(detect_color)
                 # setBuzzer(0.1)
                 # print("begin catch……")
-                reachtime = 0
+                reachtime = 0.0
                 # 高度累加
                 z = coordinate[detect_color][2]
                 # z_r += dz
@@ -225,7 +233,7 @@ def move():
                     # 计算夹持器需要旋转的角度
                     servo2_angle = getAngle(world_X, world_Y, rotation_angle)
                     Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
-                    Board.setBusServoPulse(2, servo2_angle, 500)
+                    Board.setBusServoPulse(2, servo2_angle, 500)  # 旋转爪子
                     time.sleep(0.5)
 
                     if not __isRunning:
@@ -245,55 +253,60 @@ def move():
                     AK.setPitchRangeMoving(
                         (world_X, world_Y, 12), -90, -90, 0, 1000)  # 机械臂抬起
                     time.sleep(1)
+                    start_pick_up=False
+                    print("机械臂抬起")
 
-                    if not __isRunning:
-                        continue
-                    result=AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 1500)
-                    time.sleep(result[2]/1000)
+            if detect_color!='None'and start_pick_down:
+                print("机械臂开始放下")
+                if not __isRunning:
+                    continue
+                result=AK.setPitchRangeMoving(
+                    (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 1500)
+                time.sleep(result[2]/1000)
 
-                    if not __isRunning:
-                        continue
-                    servo2_angle = getAngle(
-                        coordinate[detect_color][0], coordinate[detect_color][1], -90)
-                    Board.setBusServoPulse(2, servo2_angle, 500)
-                    time.sleep(0.5)
+                if not __isRunning:
+                    continue
+                servo2_angle = getAngle(
+                    coordinate[detect_color][0], coordinate[detect_color][1], -90)
+                Board.setBusServoPulse(2, servo2_angle, 500)
+                time.sleep(0.5)
 
-                    if not __isRunning:
-                        continue
-                    AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], z + count[detect_color]*3), -90, -90, 0, 500)
-                    time.sleep(0.5)
+                if not __isRunning:
+                    continue
+                AK.setPitchRangeMoving(
+                    (coordinate[detect_color][0], coordinate[detect_color][1], z + count[detect_color]*3), -90, -90, 0, 500)
+                time.sleep(0.5)
 
-                    if not __isRunning:
-                        continue
-                    # AK.setPitchRangeMoving(
-                    #     (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
-                    # AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
-                    # time.sleep(0.8)
+                if not __isRunning:
+                    continue
+                # AK.setPitchRangeMoving(
+                #     (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
+                # AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
+                # time.sleep(0.8)
 
-                    if not __isRunning:
-                        continue
-                    Board.setBusServoPulse(1, servo1 - 200, 500)  # 爪子张开  ，放下物体
-                    n=count[detect_color]
-                    count[detect_color]=n+1
-                    print("num %s"%(detect_color)+"=%d"%(n+1))
-                    time.sleep(1)
+                if not __isRunning:
+                    continue
+                Board.setBusServoPulse(1, servo1 - 200, 500)  # 爪子张开  ，放下物体
+                n=count[detect_color]
+                count[detect_color]=n+1
+                print("num %s"%(detect_color)+"=%d"%(n+1))
+                time.sleep(1)
 
-                    if not __isRunning:
-                        continue
-                    AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 800)
-                    time.sleep(0.8)
+                if not __isRunning:
+                    continue
+                AK.setPitchRangeMoving(
+                    (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 800)
+                time.sleep(0.8)
+                initMove()  # 回到初始位置
+                time.sleep(1.5)
 
-                    initMove()  # 回到初始位置
-                    time.sleep(1.5)
-
-                    detect_color = 'None'
-                    __target_color='None'
-                    get_roi = False
-                    start_pick_up = False
-                    set_rgb(detect_color)
+                detect_color = 'None'
+                __target_color='None'
+                get_roi = False
+                start_pick_up = False
+                start_pick_down=False
+                text='null'
+                set_rgb(detect_color)
         else:
             if _stop:
                 _stop = False
@@ -358,7 +371,7 @@ def detect(image):
     # print(box)
 
     # 以下是为了将盒子中的图像遮住防止误识别
-    # 计算条形码的轮廓的最大最小的坐标值
+    # 计算二维码的轮廓的最大最小的坐标值
     x_max = x_min = y_max = y_min = 0
 #     print(rect)
     x_min = box[0][0]
@@ -384,12 +397,12 @@ def detect(image):
     #     x_min = 0
     # if x_max > 640:
     #     x_max = 640
-    # 计算条形码的轮廓的最大最小的坐标值
+    # 计算二维码的轮廓的最大最小的坐标值
     # black_box[0] = (x_min, y_max)
     # black_box[1] = (x_min, 0)
     # black_box[2] = (x_max, 0)
     # black_box[3] = (x_max, y_max)
-    # 提取条形码后的盒子的坐标
+    # 提取二维码后的盒子的坐标
     black_box = np.int0(black_box)
     # print(black_box)
     return box, rect, black_box
@@ -423,22 +436,22 @@ def decodeDisplay(image):
     barcodes = pyzbar.decode(image)
     data = []
     for barcode in barcodes:
-        # 提取条形码的边界框的位置
-        # 画出图像中条形码的边界框
+        # 提取二维码的边界框的位置
+        # 画出图像中二维码的边界框
         (x, y, w, h) = barcode.rect
         cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-        # 条形码数据为字节对象，所以如果我们想在输出图像上
+        # 二维码数据为字节对象，所以如果我们想在输出图像上
         # 画出来，就需要先将它转换成字符串
         barcodeData = barcode.data.decode("utf-8")
         barcodeType = barcode.type
 
-        # 绘出图像上条形码的数据和条形码类型
+        # 绘出图像上二维码的数据和二维码类型
         text = "{} ({})".format(barcodeData, barcodeType)
         cv2.putText(image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
                     .5, (0, 0, 125), 2)
 
-        # 向终端打印条形码数据和条形码类型
+        # 向终端打印二维码数据和二维码类型
         print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
 
         data.append([x, y, w, h, barcodeData])
@@ -446,9 +459,44 @@ def decodeDisplay(image):
 
 
 # def find_bar_code(box, rect, frame, data):
+#重新从图片检测绝对地址
+def get_worldposition():
+    global rect
+    global roi
+    global rotation_angle
+    global __target_color
+    global get_roi
+
+    if rect is not None:
+                # print(rect)
+                if box is not None:
+                    # 获取方块的现实世界坐标
+                    roi = getROI(box)  # 获取roi区域
+                    get_roi = True
+                    img_centerx, img_centery = getCenter(
+                        rect, roi, size, square_length)  # 获取木块中心坐标
+                    rotation_angle=rect[2]
+                    world_X, world_Y = convertCoordinate(
+                        img_centerx, img_centery, size)  # 转换为现实世界坐标
+                    print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
+                    # 框出二维码或二维码部分
+                    cv2.drawContours(frame, [box], -1, (0, 255, 0), 2)
+                    cv2.imshow('img', img)
 
 # target_color,暂时用颜色代替地址
+def get_text():
+    global start_pick_up
+    global text
+    print('func get_text() started')
+    if text!='':
+        start_pick_up=True
+        return (True, (text))
+    else:
+        start_pick_up=False
+        return (True,(''))
+    
 def QRcode_sort():
+    print('func QRcode_sort() started')
     global detect_color
     global rotation_angle
     global start_pick_up
@@ -465,68 +513,75 @@ def QRcode_sort():
             img = frame.copy()
             # 检测图像中的二维码内容,仅限一个
             img, data = decodeDisplay(img)
-            # 计算出条形码的位置和盒子位置
-            box, rect, black_box = detect(img)
+            my_camera.camera_close()
+            cv2.destroyAllWindows()
+            if len(data)!=0:
+                text = data[0][4]
+                start_pick_up = True
+                print('return text')
+                return (True,(text))
+            else:
+                __target_color = 'None'
+                print('return None')
+                return (True,('None'))
 
-            if rect is not None:
-                # print(rect)
-                if box is not None:
-                    # 获取方块的现实世界坐标
-                    roi = getROI(box)  # 获取roi区域
-                    get_roi = True
-
-                    img_centerx, img_centery = getCenter(
-                        rect, roi, size, square_length)  # 获取木块中心坐标
-                    rotation_angle=rect[2]
-                    world_X, world_Y = convertCoordinate(
-                        img_centerx, img_centery, size)  # 转换为现实世界坐标
-                    print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
-                    # 框出条形码或二维码部分
-                    cv2.drawContours(frame, [box], -1, (0, 255, 0), 2)
-                    cv2.imshow('img', img)
-                    if len(data) != 0:
+            
+                    
+                    # if len(data) != 0:
                         # 在frame上显示识别内容
-                        text = data[0][4]
-                        cv2.putText(frame, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                                    .5, (0, 0, 125), 2)
+                        # text = data[0][4]
+                        # cv2.putText(frame, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,.5, (0, 0, 125), 2)
                         # xx, yy = convertCoordinate(
                         #     data[0][0], data[0][1], size)
                         # print(xx, yy)
-                        # 检测到特定条形码内容时才会抓取
-                        if data[0][4] == '000000004':
-                            detect_color = ('blue')
-                            start_pick_up = True
-                            # coordinate['blue'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == '100000020':
-                            detect_color = ('red')
-                            start_pick_up = True
-                            # coordinate['red'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == '000000003':
-                            detect_color = ('green')
-                            start_pick_up = True
-                            # coordinate['green'] = (xx+2, yy+5, 12)
-                        else:
-                            detect_color = 'None'
-                    else:
-                        __target_color = 'None'
+                        # 检测到特定二维码内容时才会抓取
+                        # if data[0][4] == '000000004':
+                        #     detect_color = ('blue')
+                        #     start_pick_up = True
+                        #     # coordinate['blue'] = (xx+2, yy+5, 12)
+                        # elif data[0][4] == '100000020':
+                        #     detect_color = ('red')
+                        #     start_pick_up = True
+                        #     # coordinate['red'] = (xx+2, yy+5, 12)
+                        # elif data[0][4] == '000000003':
+                        #     detect_color = ('green')
+                        #     start_pick_up = True
+                        #     # coordinate['green'] = (xx+2, yy+5, 12)
+                        # else:
+                        #     detect_color = 'None'
+                        # return text
+                    # else:
+                    #     __target_color = 'None'
+                    #     return 'None'
 
             # img = run(img)
-            cv2.imshow('frame', frame)
-            key = cv2.waitKey(1)
-            if key == 27:
-                break
-    my_camera.camera_close()
-    cv2.destroyAllWindows()
-    # 返回编号
-    # 如果采用预抓取则不需要返回方块位置
-    return text
+            # cv2.imshow('frame', frame)
+            # key = cv2.waitKey(1)
+            # if key == 27:
+            #     break
+            # else:
+            #     my_camera.camera_close()
+            #     cv2.destroyAllWindows()
+            #     # 返回编号
+            #     # 如果采用预抓取则不需要返回方块位置
+            #     return 'None'
 
 def setTargetColor(target_color):
     global __target_color
-
+    global text
+    global start_pick_up
+    global start_pick_down
+    print('func setTargetColor() started')
     print("COLOR", target_color)
     __target_color = target_color
-    return (True, ())
+    if text!='null':
+        start_pick_down=True
+    else:
+        start_pick_down=False
+    return (True, (text))
+
+    
+
 def run(img):
     global rect
     global _stop
@@ -537,14 +592,15 @@ def run(img):
     global detect_color
     global __target_color
     global count
+    global text
     global start_pick_up
     global rotation_angle
     global world_X, world_Y
     global z_r, z_g, z_b, z
-
+    # print('func run() started')
     # 检测图像中的二维码内容,仅限一个
     img, data = decodeDisplay(img)
-    # 计算出条形码的位置和盒子位置
+    # 计算出二维码的位置和盒子位置
     box, rect, black_box = detect(img)
 
     if rect is not None:
@@ -558,11 +614,11 @@ def run(img):
             rotation_angle=rect[2]
             world_X, world_Y = convertCoordinate(
                         img_centerx, img_centery, size)  # 转换为现实世界坐标
-            print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
-            # 框出条形码或二维码部分
-            cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
-            cv2.imshow('img', img)
-            if len(data) != 0:
+            # print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
+            # 框出二维码或二维码部分
+            # cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
+            # cv2.imshow('img', img)
+            if len(data) != 0 and text=='null':
             # 在frame上显示识别内容
                 text = data[0][4]
                 cv2.putText(img, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
@@ -570,88 +626,76 @@ def run(img):
                 # xx, yy = convertCoordinate(
                 #     data[0][0], data[0][1], size)
                 # print(xx, yy)
-                # 检测到特定条形码内容时才会抓取
-                if data[0][4] == '000000004':
-                    detect_color = ('blue')
-                    start_pick_up = True
-                    # coordinate['blue'] = (xx+2, yy+5, 12)
-                elif data[0][4] == '100000020':
-                    detect_color = ('red')
-                    start_pick_up = True
-                    # coordinate['red'] = (xx+2, yy+5, 12)
-                elif data[0][4] == '000000003':
-                    detect_color = ('green')
-                    start_pick_up = True
-                    # coordinate['green'] = (xx+2, yy+5, 12)
-                else:
-                    detect_color = 'None'
+                if text!='null':
+                    start_pick_up=True
         else:
             __target_color = 'None'
+        # print('func run() finished')
+        return (True,("run "+text))
         
-                
-
 
 if __name__ == '__main__':
-    # QRcode_sort()
-    init()
-    start()
-    my_camera = Camera.Camera()
-    my_camera.camera_open()
-    while True:
-        frame = my_camera.frame
-        if frame is not None:
-            img = frame.copy()
-            # 检测图像中的二维码内容,仅限一个
-            img, data = decodeDisplay(img)
-            # 计算出条形码的位置和盒子位置
-            box, rect, black_box = detect(img)
+    print('func main() started')
+    QRcode_sort()
+    # init()
+    # start()
+    # my_camera = Camera.Camera()
+    # my_camera.camera_open()
+    # while True:
+    #     frame = my_camera.frame
+    #     if frame is not None:
+    #         img = frame.copy()
+    #         # 检测图像中的二维码内容,仅限一个
+    #         img, data = decodeDisplay(img)
+    #         # 计算出二维码的位置和盒子位置
+    #         box, rect, black_box = detect(img)
 
-            if rect is not None:
-                # print(rect)
-                if box is not None:
-                    # 获取方块的现实世界坐标
-                    roi = getROI(box)  # 获取roi区域
-                    get_roi = True
+    #         if rect is not None:
+    #             # print(rect)
+    #             if box is not None:
+    #                 # 获取方块的现实世界坐标
+    #                 roi = getROI(box)  # 获取roi区域
+    #                 get_roi = True
 
-                    img_centerx, img_centery = getCenter(
-                        rect, roi, size, square_length)  # 获取木块中心坐标
-                    rotation_angle=rect[2]
-                    world_X, world_Y = convertCoordinate(
-                        img_centerx, img_centery, size)  # 转换为现实世界坐标
-                    print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
-                    # 框出条形码或二维码部分
-                    cv2.drawContours(frame, [box], -1, (0, 255, 0), 2)
-                    cv2.imshow('img', img)
-                    if len(data) != 0:
-                        # 在frame上显示识别内容
-                        text = data[0][4]
-                        cv2.putText(frame, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                                    .5, (0, 0, 125), 2)
-                        xx, yy = convertCoordinate(
-                            data[0][0], data[0][1], size)
-                        # print(xx, yy)
-                        # 检测到特定条形码内容时才会抓取
-                        if data[0][4] == '000000004':
-                            detect_color = ('blue')
-                            start_pick_up = True
-                            # coordinate['blue'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == '100000020':
-                            detect_color = ('red')
-                            start_pick_up = True
-                            # coordinate['red'] = (xx+2, yy+5, 12)
-                        elif data[0][4] == '000000003':
-                            detect_color = ('green')
-                            start_pick_up = True
-                            # coordinate['green'] = (xx+2, yy+5, 12)
-                        else:
-                            detect_color = ('None')
-                    else:
-                        __target_color = ('None')
+    #                 img_centerx, img_centery = getCenter(
+    #                     rect, roi, size, square_length)  # 获取木块中心坐标
+    #                 rotation_angle=rect[2]
+    #                 world_X, world_Y = convertCoordinate(
+    #                     img_centerx, img_centery, size)  # 转换为现实世界坐标
+    #                 print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
+    #                 # 框出二维码或二维码部分
+    #                 cv2.drawContours(frame, [box], -1, (0, 255, 0), 2)
+    #                 cv2.imshow('img', img)
+    #                 if len(data) != 0:
+    #                     # 在frame上显示识别内容
+    #                     text = data[0][4]
+    #                     cv2.putText(frame, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
+    #                                 .5, (0, 0, 125), 2)
+    #                     xx, yy = convertCoordinate(
+    #                         data[0][0], data[0][1], size)
+    #                     # print(xx, yy)
+    #                     # 检测到特定二维码内容时才会抓取
+    #                     if data[0][4] == '000000004':
+    #                         detect_color = ('blue')
+    #                         start_pick_up = True
+    #                         # coordinate['blue'] = (xx+2, yy+5, 12)
+    #                     elif data[0][4] == '100000020':
+    #                         detect_color = ('red')
+    #                         start_pick_up = True
+    #                         # coordinate['red'] = (xx+2, yy+5, 12)
+    #                     elif data[0][4] == '000000003':
+    #                         detect_color = ('green')
+    #                         start_pick_up = True
+    #                         # coordinate['green'] = (xx+2, yy+5, 12)
+    #                     else:
+    #                         detect_color = ('None')
+    #                 else:
+    #                     __target_color = ('None')
 
-            # img = run(img)
-            cv2.imshow('frame', frame)
-            key = cv2.waitKey(1)
-            if key == 27:
-                break
-    my_camera.camera_close()
-    cv2.destroyAllWindows()
+    #         # img = run(img)
+    #         cv2.imshow('frame', frame)
+    #         key = cv2.waitKey(1)
+    #         if key == 27:
+    #             break
+    # my_camera.camera_close()
+    # cv2.destroyAllWindows()
