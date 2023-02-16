@@ -1,19 +1,3 @@
-python3 ArmPi.py 
-sudo systemctl stop armpi.service 
-ls
-cd ArmPi
-ls
-cd Functions/
-ls
-vim ColorTracking.py 
-sudo apt-get update && sudo apt-get upgrade -y
-sudo reboot 
-df -h
-cd Functions/
-vim ASRControl.py 
-vim ColorPalletizing.py 
-python3 ArmPi.py 
-ls
 cd ArmPi
 ls
 cd Functions/
@@ -1998,3 +1982,19 @@ cd /home/pi/ArmPi/
 ls
 tail -n10 -f text.log
 sudo reboot
+git remote -v
+git push origin2
+git remote -v
+sudo python ArmPi.py 
+clear
+sudo python ArmPi.py 
+git push origin2
+git remote -v
+git push origin2
+sudo python ArmPi.py 
+sudo python ArmPi.py
+sudo shutdown -h now
+sudo python ArmPi.py 
+sudo shutdown -h now
+sudo python ArmPi.py 
+sudo python ArmPi.py

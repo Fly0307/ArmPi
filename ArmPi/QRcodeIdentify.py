@@ -96,6 +96,7 @@ get_roi = False
 __isRunning = False
 detect_color = 'None'
 start_pick_up = False  # 为true时抓取方块
+pick_up=False
 start_pick_down = False  # 为true时放置方块，均为false时恢复初始状态
 start_count_t1 = True
 
@@ -107,6 +108,8 @@ def reset():
     global color_list
     global detect_color
     global start_pick_up
+    global start_pick_down
+    global pick_up
     global __target_color
     global start_count_t1
     global z_r, z_g, z_b, z
@@ -120,6 +123,7 @@ def reset():
     __target_color = 'None'
     detect_color = 'None'
     start_pick_up = False
+    pick_up=False
     start_pick_down = False
     start_count_t1 = True
     z_r = coordinate['red'][2]
@@ -181,6 +185,7 @@ def move():
     global text
     global start_pick_up
     global start_pick_down
+    global pick_up
     global rotation_angle
     global world_X, world_Y
     global z_r, z_g, z_b, z
@@ -257,10 +262,12 @@ def move():
                     #预运动到码垛区上方
                     AK.setPitchRangeMoving(
                         (-15 + 0.5, 6, 12), -90, -90, 0, 1000)  # 机械臂抬起
+                    pick_up=True
                     print("机械臂抬起")
 
             if detect_color!='None'and start_pick_down:
                 print("机械臂开始放下")
+                pick_up=False
                 if not __isRunning:
                     continue
                 result=AK.setPitchRangeMoving(
@@ -495,6 +502,27 @@ def get_text():
     __target_color=__target_color
     print('func get_text() started')
     return (True,(text))
+#心跳检测，用以返回当前机械臂状态
+# 0 未识别到数据  1抓取阶段
+# 2 放置阶段  3抓取悬空阶段
+def Heartbeat(alive):
+    global start_pick_up
+    global start_pick_down
+    global pick_up
+    global text
+    if text=='null':
+        return (True,(0))
+    if alive:
+        start_pick_up=True
+        return (True,(1))
+    if pick_up:
+        return (True,(3))
+    if start_pick_up:
+        return (True,(1))
+    if start_pick_down:
+        return (True,(2))
+
+
 
 def setTargetColor(target_color):
     global __target_color
@@ -512,7 +540,23 @@ def setTargetColor(target_color):
         else:
             start_pick_down=False
         return (True, (text))
-    
+
+def setTargetColor(target_color):
+    global __target_color
+    global text
+    global start_pick_up
+    global start_pick_down
+    print('func setTargetColor() started')
+    if target_color=='None':
+        return (True,(text))
+    else:
+        # print("COLOR", target_color)
+        __target_color = target_color
+        if text!='null':
+            start_pick_down=True
+        else:
+            start_pick_down=False
+        return (True, (text))
 
 def QRcode_sort():
     print('func QRcode_sort() started')
@@ -536,7 +580,7 @@ def QRcode_sort():
             cv2.destroyAllWindows()
             if len(data)!=0:
                 text = data[0][4]
-                start_pick_up = True
+                # start_pick_up = True
                 print('return text')
                 return (True,(text))
             else:

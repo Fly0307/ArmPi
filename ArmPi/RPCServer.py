@@ -380,6 +380,10 @@ def ColorPalletizing(*target_color):
 @dispatcher.add_method
 def CargoSorting():
     return runbymainth(QRcodeIdentify.get_text, ())
+#心跳检测
+@dispatcher.add_method
+def ArmHeartbeat(alive):
+    return runbymainth(QRcodeIdentify.Heartbeat, alive)
 
 @dispatcher.add_method
 def GetOrderId():
