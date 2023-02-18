@@ -1,19 +1,3 @@
-cd ArmIK/
-ls
-clear
-ls
-vim InverseKinematics.py 
-vim ArmMoveIK.py 
-vim Transform.py 
-ls
-sudo systemctl stop armpi.service 
-cd ..
-ls
-vim Camera.py 
-python3 Camera.py 
-vim Camera.py 
-vim LABConfig.py 
-sudo udevadm info --query=all --name=/dev/video0
 ls /dev/video*
 sudo udevadm info --query=all --name=/dev/video1
 sudo vim /etc/udev/rules.d/
@@ -1998,3 +1982,19 @@ sudo python ArmPi.py
 clear
 sudo python ArmPi.py 
 sudo python ArmPi.py
+ls
+clear
+ls
+clear
+sudo python QRcodeIdentify.py
+clear
+sudo python QRcodeIdentify.py
+clear
+sudo python QRcodeIdentify.py
+cear
+clear
+sudo python ArmPi.py 
+sudo python QRcodeIdentify.py
+clear
+sudo python QRcodeIdentify.py
+clear

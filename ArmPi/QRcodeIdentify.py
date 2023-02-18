@@ -38,10 +38,11 @@ range_rgb = {
 #     'green': (-15 + 0.5, 6 - 0.5,  2),
 #     'blue':  (-15 + 0.5, 0 - 0.5,  2),
 # }
+#坐标以机械臂底座舵机为中心
 coordinate = {
-        'red':   (-15 + 0.5, 3 - 0.5, 1.5),
-        'green': (-15 + 0.5, -3 - 0.5,  1.5),
-        'blue':  (-15 + 0.5, -9 - 0.5,  1.5),
+        'red':   (-15 + 0.5, 6 - 0.5, 2),
+        'green': (-15 + 0.5, -0 - 0.5,  2),
+        'blue':  (-15 + 0.5, -6 - 0.5,  2),
     }
 
 __target_color = ('None')
@@ -50,7 +51,6 @@ __target_color = ('None')
 
 # 夹持器夹取时闭合的角度
 servo1 = 500
-
 # 初始位置
 
 
@@ -194,7 +194,6 @@ def move():
     global rotation_angle
     global world_X, world_Y
     global z_r, z_g, z_b, z
-    dz = 2.5
 
     while True:
         # print("detect_color 1=%s" % detect_color)
@@ -202,137 +201,154 @@ def move():
             # print("detect_color=%s" % detect_color)
             # print(start_pick_up)
             # 检测到特定二维码内容时才会抓取
-            if text == '000000004':
-                detect_color = ('blue')
-                # start_pick_up = True
-            elif text == '100000020':
-                detect_color = ('red')
-                # start_pick_up = True
-            elif text == '000000003':
-                detect_color = ('green')
-                # start_pick_up = True
-            else:
-                detect_color = 'None'
-            if detect_color != 'None' and start_pick_up:  # 如果检测到方块没有移动一段时间后，开始夹取
-                set_rgb(detect_color)
-                # setBuzzer(0.1)
-                # print("begin catch……")
-                reachtime = 0.0
-                # 高度累加
-                z = coordinate[detect_color][2]
-                # z_r += dz
-                # if z == 2 * dz + coordinate['red'][2]:
-                #     z_r = coordinate['red'][2]
-                # if z == coordinate['red'][2]:
-                #     move_square = True
-                #     time.sleep(3)
-                #     move_square = False
-                print("move to world_X=%d"%(world_X) +"and world_Y=%d"%(world_Y))
-                result = AK.setPitchRangeMoving(
-                    (world_X, world_Y, 7), -90, -90, 0)  # 移到目标位置，高度5cm
-                if result == False:
-                    unreachable = True
-                else:
-                    unreachable = False
-                    reachtime += result[2]/1000
-                    time.sleep(result[2]/1000)
-                    print("reachtime=%d"%(reachtime))
+            # if text == '000000004':
+            #     detect_color = ('blue')
+            #     # start_pick_up = True
+            # elif text == '100000020':
+            #     detect_color = ('red')
+            #     # start_pick_up = True
+            # elif text == '000000003':
+            #     detect_color = ('green')
+            #     # start_pick_up = True
+            # else:
+            #     detect_color = 'None'
+            get_it=False
+            while not get_it:
+                if detect_color != 'None' and start_pick_up:  # 如果检测到方块没有移动一段时间后，开始夹取
+                    set_rgb(detect_color)
+                    # setBuzzer(0.1)
+                    # print("begin catch……")
+                    reachtime = 0.0
+                    # 高度累加
+                    z = coordinate[detect_color][2]
+                    # z_r += dz
+                    # if z == 2 * dz + coordinate['red'][2]:
+                    #     z_r = coordinate['red'][2]
+                    # if z == coordinate['red'][2]:
+                    #     move_square = True
+                    #     time.sleep(3)
+                    #     move_square = False
+                    print("move to world_X=%d"%(world_X) +"and world_Y=%d"%(world_Y))
+                    result = AK.setPitchRangeMoving(
+                        (world_X, world_Y, 7), -90, -90, 0)  # 移到目标位置，高度5cm
+                    if result == False:
+                        unreachable = True
+                    else:
+                        unreachable = False
+                        reachtime += result[2]/1000
+                        time.sleep(result[2]/1000)
+                        print("reachtime=%d"%(reachtime))
 
-                    if not __isRunning:
-                        continue
-                    # 计算夹持器需要旋转的角度
-                    servo2_angle = getAngle(world_X, world_Y, rotation_angle)
-                    Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
-                    Board.setBusServoPulse(2, servo2_angle, 500)  # 旋转爪子
-                    time.sleep(0.5)
+                        if not __isRunning:
+                            continue
+                        # 计算夹持器需要旋转的角度
+                        servo2_angle = getAngle(world_X, world_Y, rotation_angle)
+                        Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
+                        Board.setBusServoPulse(2, servo2_angle, 500)  # 旋转爪子
+                        time.sleep(0.5)
 
-                    if not __isRunning:
-                        continue
-                    AK.setPitchRangeMoving(
-                        (world_X, world_Y, 1.5), -90, -90, 0, 1000)  # 降低高度到2cm
-                    time.sleep(1.5)
+                        if not __isRunning:
+                            continue
+                        AK.setPitchRangeMoving(
+                            (world_X, world_Y, 1.5), -90, -90, 0, 1000)  # 降低高度到2cm
+                        time.sleep(1.5)
 
-                    if not __isRunning:
-                        continue
-                    Board.setBusServoPulse(1, servo1, 500)  # 夹持器闭合
-                    time.sleep(0.8)
+                        if not __isRunning:
+                            continue
+                        Board.setBusServoPulse(1, servo1, 500)  # 夹持器闭合
+                        time.sleep(0.8)
 
-                    if not __isRunning:
-                        continue
-                    Board.setBusServoPulse(2, 500, 500)
-                    AK.setPitchRangeMoving(
-                        (world_X, world_Y, 12), -90, -90, 0, 1000)  # 机械臂抬起
-                    time.sleep(1)
+                        if not __isRunning:
+                            continue
+                        Board.setBusServoPulse(2, 500, 500)
+                        AK.setPitchRangeMoving(
+                            (world_X, world_Y, 12), -90, -90, 0, 1000)  # 机械臂抬起
+                        time.sleep(1)
+                        servo1_now=Board.getBusServoPulse(1)
+                        print("servo1_now=%d"%servo1_now)
+                        
+                        #预运动到码垛区上方
+                        AK.setPitchRangeMoving(
+                            (0, 10, 12), -90, -90, 0, 1000)  # 机械臂抬起
+                        time.sleep(1)
+                        #未夹取成功
+                        if servo1_now<350:
+                            get_it=True
+                        else: 
+                            print("don't get it")
+                            continue
+                        pick_up=True
+                        start_pick_up=False
+                        print("机械臂抬起")
+            put_it=False
+            while not put_it:
+                if detect_color!='None'and start_pick_down:
+                    print("机械臂开始放下 detect_color=%s"%detect_color)
+                    pick_up=False
                     start_pick_up=False
-                    #预运动到码垛区上方
+                    if not __isRunning:
+                        continue
+                    result=AK.setPitchRangeMoving(
+                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0)
+                    print(result)
+                    time.sleep(result[2]/1000)
+
+                    # if not __isRunning:
+                    #     continue
+                    # servo2_angle = getAngle(
+                    #     coordinate[detect_color][0], coordinate[detect_color][1], -90)
+                    # Board.setBusServoPulse(2, servo2_angle, 500)
+                    # time.sleep(0.5)
+
+                    if not __isRunning:
+                        continue
+                    result=AK.setPitchRangeMoving(
+                        (coordinate[detect_color][0], coordinate[detect_color][1], z + count[detect_color]*3), -90, -90, 0)
+                    print(result)
+                    if not result:
+                        continue
+                    time.sleep(result[2]/1000)
+
+                    # if not __isRunning:
+                    #     continue
+                    # AK.setPitchRangeMoving(
+                    #     (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
+                    # AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
+                    # time.sleep(0.8)
+
+                    if not __isRunning:
+                        continue
+                    Board.setBusServoPulse(1, servo1 - 200, 500)  # 爪子张开  ，放下物体
+                    put_it=True
+                    n=count[detect_color]
+                    count[detect_color]=n+1
+                    print("num %s"%(detect_color)+"=%d"%(n+1))
+                    time.sleep(1)
+
+                    if not __isRunning:
+                        continue
                     AK.setPitchRangeMoving(
-                        (-15 + 0.5, 6, 12), -90, -90, 0, 1000)  # 机械臂抬起
-                    pick_up=True
-                    print("机械臂抬起")
-
-            if detect_color!='None'and start_pick_down:
-                print("机械臂开始放下")
-                pick_up=False
-                if not __isRunning:
-                    continue
-                result=AK.setPitchRangeMoving(
-                    (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 1500)
-                time.sleep(result[2]/1000)
-
-                if not __isRunning:
-                    continue
-                servo2_angle = getAngle(
-                    coordinate[detect_color][0], coordinate[detect_color][1], -90)
-                Board.setBusServoPulse(2, servo2_angle, 500)
-                time.sleep(0.5)
-
-                if not __isRunning:
-                    continue
-                AK.setPitchRangeMoving(
-                    (coordinate[detect_color][0], coordinate[detect_color][1], z + count[detect_color]*3), -90, -90, 0, 500)
-                time.sleep(0.5)
-
-                if not __isRunning:
-                    continue
-                # AK.setPitchRangeMoving(
-                #     (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
-                # AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
-                # time.sleep(0.8)
-
-                if not __isRunning:
-                    continue
-                Board.setBusServoPulse(1, servo1 - 200, 500)  # 爪子张开  ，放下物体
-                n=count[detect_color]
-                count[detect_color]=n+1
-                print("num %s"%(detect_color)+"=%d"%(n+1))
-                time.sleep(1)
-
-                if not __isRunning:
-                    continue
-                AK.setPitchRangeMoving(
-                    (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 800)
-                time.sleep(0.8)
-                initMove()  # 回到初始位置
-                time.sleep(1.5)
-
-                detect_color = 'None'
-                __target_color='None'
-                get_roi = False
-                start_pick_up = False
-                start_pick_down=False
-                text='null'
-                set_rgb(detect_color)
-        else:
-            if _stop:
-                _stop = False
-                Board.setBusServoPulse(1, servo1 - 70, 300)
-                time.sleep(0.5)
-                Board.setBusServoPulse(2, 500, 500)
-                AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
-                time.sleep(1.5)
-                # initMove()
-                time.sleep(1.5)
-            time.sleep(0.01)
+                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 800)
+                    time.sleep(0.8)
+                    detect_color = 'None'
+                    __target_color='None'
+                    get_roi = False
+                    start_pick_up = False
+                    text='null'
+                    set_rgb(detect_color)
+                    initMove()  # 回到初始位置
+                    time.sleep(1.5)
+                else:
+                    if _stop:
+                        _stop = False
+                        Board.setBusServoPulse(1, servo1 - 70, 300)
+                        time.sleep(0.5)
+                        Board.setBusServoPulse(2, 500, 500)
+                        AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+                        time.sleep(1.5)
+                        # initMove()
+                        time.sleep(1.5)
+                    time.sleep(0.01)
 
 
 # 运行子线程
@@ -341,8 +357,6 @@ th.setDaemon(True)
 th.start()
 
 # 识别处理图片
-
-
 def detect(image):
 
     # 读取图像并将其转化为灰度图片
@@ -450,27 +464,37 @@ def angle(a, R=10):
 def decodeDisplay(image):
     barcodes = pyzbar.decode(image)
     data = []
+    box=None
+    rect=None
+    if not barcodes:
+            print('No barcode found.')
+            time.sleep(1)
+            return image,box,rect, data
+    # 记录最大面积的二维码
+    max_area = 0
+    max_barcode = None
+    # 遍历所有二维码
     for barcode in barcodes:
-        # 提取二维码的边界框的位置
-        # 画出图像中二维码的边界框
-        (x, y, w, h) = barcode.rect
-        cv2.rectangle(image, (x, y), (x + w, y + h), (0, 0, 255), 2)
-
-        # 二维码数据为字节对象，所以如果我们想在输出图像上
-        # 画出来，就需要先将它转换成字符串
-        barcodeData = barcode.data.decode("utf-8")
-        barcodeType = barcode.type
-
-        # 绘出图像上二维码的数据和二维码类型
-        text = "{} ({})".format(barcodeData, barcodeType)
-        cv2.putText(image, text, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                    .5, (0, 0, 125), 2)
-
-        # 向终端打印二维码数据和二维码类型
-        print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
-
-        data.append([x, y, w, h, barcodeData])
-    return image, data
+        # 计算二维码轮廓面积
+        area = barcode.rect.width * barcode.rect.height
+        # 如果当前二维码面积更大，则记录下该二维码
+        if area > max_area:
+            max_area = area
+            max_barcode = barcode
+    print("max_area=%d"%max_area)
+    # 如果找到了最大面积的二维码，则输出二维码信息和边框位置
+    if max_barcode is not None:
+        # 输出二维码信息
+        print(max_barcode.data.decode('utf-8'))
+        # 找到二维码的最小边框位置
+        rect = cv2.minAreaRect(np.array(max_barcode.polygon, np.int32))
+        box = cv2.boxPoints(rect)
+        box = np.int0(box)
+    (x, y, w, h) = max_barcode.rect
+    print("x=%d"%(x)+"y=%d"%(y))
+    barcodeData = max_barcode.data.decode("utf-8")
+    data.append([x, y, w, h, barcodeData])
+    return image,box,rect, data
 
 
 # def find_bar_code(box, rect, frame, data):
@@ -563,7 +587,7 @@ def setTargetColor(target_color):
             start_pick_down=False
         return (True, (text))
 
-def QRcode_sort():
+""" def QRcode_sort():
     print('func QRcode_sort() started')
     global detect_color
     global rotation_angle
@@ -629,7 +653,100 @@ def QRcode_sort():
             #     cv2.destroyAllWindows()
             #     # 返回编号
             #     # 如果采用预抓取则不需要返回方块位置
-            #     return 'None'
+            #     return 'None' """
+def QRcode_sort_debug():
+    print('func QRcode_sort() started')
+    global detect_color
+    global rotation_angle
+    global start_pick_up
+    global start_pick_down
+    global __target_color
+    global get_roi
+    global world_X, world_Y
+
+    init()
+    start()
+    my_camera = Camera.Camera()
+    my_camera.camera_open()
+    while True:
+        frame = my_camera.frame
+        if frame is not None:
+            img = frame.copy()
+            # 检测图像中的二维码内容,仅限一个
+            img,box, rect,data = decodeDisplay(img)
+            # 计算出二维码的位置和盒子位置
+            # box, rect, black_box = detect(img)
+            
+            # my_camera.camera_close()
+            # cv2.destroyAllWindows()
+            # print(rect)
+            if rect is not None:
+                if box is not None:
+                # 获取方块的现实世界坐标
+                    roi = getROI(box)  # 获取roi区域
+                    get_roi = True
+                    img_centerx, img_centery = getCenter(
+                                rect, roi, size, square_length)  # 获取木块中心坐标
+                    rotation_angle=rect[2]
+                    world_X, world_Y = convertCoordinate(
+                                img_centerx, img_centery, size)  # 转换为现实世界坐标
+                    print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
+                    # 框出二维码或二维码部分
+                    # cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
+                    cv2.imshow('img', img)
+                    if len(data)==0:
+                        # text = data[0][4]
+                        # start_pick_up = True
+                        print('return text')
+                        # return (True,(text))
+                    else:
+                        __target_color = 'None'
+                        # print('return None')
+                        # return (True,('None'))                    
+                        if len(data) != 0:
+                            # 在frame上显示识别内容
+                            text = data[0][4]
+                            cv2.putText(frame, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,.5, (0, 0, 125), 2)
+                            # xx, yy = convertCoordinate(
+                            #     data[0][0], data[0][1], size)
+                            # print(xx, yy)
+                            # 检测到特定二维码内容时才会抓取
+                            if data[0][4] == '000000004' or data[0][4]=='000000019':
+                                detect_color = ('blue')
+                                start_pick_up = True
+                                start_pick_down=True
+                                # coordinate['blue'] = (xx+2, yy+5, 12)
+                            elif data[0][4] == '100000020' or data[0][4]=='000000009':
+                                detect_color = ('red')
+                                start_pick_up = True
+                                start_pick_down=True
+                                # coordinate['red'] = (xx+2, yy+5, 12)
+                            elif data[0][4] == '000000003'or data[0][4]=='000000005':
+                                detect_color = ('green')
+                                start_pick_up = True
+                                start_pick_down=True
+                                # coordinate['green'] = (xx+2, yy+5, 12)
+                            else:
+                                detect_color = 'None'
+                            # return text
+                        else:
+                            __target_color = 'None'
+                            # return 'None'
+
+            # img = run(img)
+            cv2.imshow('frame', frame)
+            frame=None
+            key = cv2.waitKey(1)
+            if key == 27:
+                break
+            else:
+                if not __isRunning:
+                    my_camera.camera_close()
+                    cv2.destroyAllWindows()
+                    return
+                # 返回编号
+                # 如果采用预抓取则不需要返回方块位置
+                # return 'None'
 
 
 
@@ -650,11 +767,11 @@ def run(img):
     global rotation_angle
     global world_X, world_Y
     global z_r, z_g, z_b, z
-    # print('func run() started')
+    print('func run() started')
     # 检测图像中的二维码内容,仅限一个
-    img, data = decodeDisplay(img)
+    img,box, rect, data = decodeDisplay(img)
     # 计算出二维码的位置和盒子位置
-    box, rect, black_box = detect(img)
+    # box, rect, black_box = detect(img)
 
     if rect is not None:
     # print(rect)
@@ -689,7 +806,7 @@ def run(img):
 
 if __name__ == '__main__':
     print('func main() started')
-    QRcode_sort()
+    QRcode_sort_debug()
     # init()
     # start()
     # my_camera = Camera.Camera()
