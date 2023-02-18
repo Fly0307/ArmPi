@@ -28,16 +28,21 @@ range_rgb = {
     'white': (255, 255, 255),
 }
 # 放置位置,代表地址，和demo图纸不同颜色对应
-placement_area = {
-    'red':   (-15 + 0.5, 12 - 0.5, 1.5),
-    'green': (-15 + 0.5, 6 - 0.5,  1.5),
-    'blue':  (-15 + 0.5, 0 - 0.5,  1.5),
-}
+# placement_area = {
+#     'red':   (-15 + 0.5, 12 - 0.5, 1.5),
+#     'green': (-15 + 0.5, 6 - 0.5,  1.5),
+#     'blue':  (-15 + 0.5, 0 - 0.5,  1.5),
+# }
+# coordinate = {
+#     'red':   (-15 + 0.5, 12 - 0.5, 2),
+#     'green': (-15 + 0.5, 6 - 0.5,  2),
+#     'blue':  (-15 + 0.5, 0 - 0.5,  2),
+# }
 coordinate = {
-    'red':   (-15 + 0.5, 12 - 0.5, 2),
-    'green': (-15 + 0.5, 6 - 0.5,  2),
-    'blue':  (-15 + 0.5, 0 - 0.5,  2),
-}
+        'red':   (-15 + 0.5, 3 - 0.5, 1.5),
+        'green': (-15 + 0.5, -3 - 0.5,  1.5),
+        'blue':  (-15 + 0.5, -9 - 0.5,  1.5),
+    }
 
 __target_color = ('None')
 # 设置检测颜色
@@ -524,22 +529,22 @@ def Heartbeat(alive):
 
 
 
-def setTargetColor(target_color):
-    global __target_color
-    global text
-    global start_pick_up
-    global start_pick_down
-    print('func setTargetColor() started')
-    if target_color=='None':
-        return (True,(text))
-    else:
-        # print("COLOR", target_color)
-        __target_color = target_color
-        if text!='null':
-            start_pick_down=True
-        else:
-            start_pick_down=False
-        return (True, (text))
+# def setTargetColor(target_color):
+#     global __target_color
+#     global text
+#     global start_pick_up
+#     global start_pick_down
+#     print('func setTargetColor() started')
+#     if target_color=='None':
+#         return (True,(text))
+#     else:
+#         # print("COLOR", target_color)
+#         __target_color = target_color
+#         if text!='null':
+#             start_pick_down=True
+#         else:
+#             start_pick_down=False
+#         return (True, (text))
 
 def setTargetColor(target_color):
     global __target_color
@@ -586,10 +591,7 @@ def QRcode_sort():
             else:
                 __target_color = 'None'
                 print('return None')
-                return (True,('None'))
-
-            
-                    
+                return (True,('None'))                    
                     # if len(data) != 0:
                         # 在frame上显示识别内容
                         # text = data[0][4]

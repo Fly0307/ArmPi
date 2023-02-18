@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 # coding=utf8
+import sys
+sys.path.append('/home/pi/ArmPi/')
 from Functions.ASRControl import *
 import Functions.ColorPalletizing as ColorPalletiz
 import Functions.ColorSorting as ColorSort
@@ -18,8 +20,7 @@ import threading
 import logging
 import time
 import os
-import sys
-sys.path.append('/home/pi/ArmPi/')
+
 
 if sys.version_info.major == 2:
     print('Please run this program with python3!')

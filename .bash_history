@@ -1,17 +1,3 @@
-cd ArmPi
-ls
-cd Functions/
-vim ASRControl.py 
-ls
-vim RemoteControl.py 
-vim Running.py 
-ls
-cd ..
-ls
-ps -ef|grep python
-vim ArmPi.py 
-ls
-vim Camera.py 
 cd ArmIK/
 ls
 clear
@@ -1996,5 +1982,19 @@ sudo python ArmPi.py
 sudo shutdown -h now
 sudo python ArmPi.py 
 sudo shutdown -h now
+sudo python ArmPi.py 
+sudo python ArmPi.py
+git push origin2
+sudo shutdown -h now
+sudo python ArmPi.py 
+sudo shoutdown -h now
+sudo shutdown -h now
+git status
+git push origin
+git push origin2
+sudo python ArmPi.py 
+clear
+sudo python ArmPi.py 
+clear
 sudo python ArmPi.py 
 sudo python ArmPi.py
