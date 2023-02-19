@@ -1,6 +1,3 @@
-ls /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-ls /dev/video*
 sudo /etc/init.d/udev restart
 ls /dev/video*
 sudo vim /etc/udev/rules.d/99-com.rules 
@@ -1998,3 +1995,6 @@ git log
 sudo git reset ba98
 git log
 clear
+sudo python QRcodeIdentify.py 
+clear
+sudo python ArmPi.py 
