@@ -227,6 +227,7 @@ def move():
                             print("can't reach")
                         time.sleep(result[2]/1000)
                         Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
+                        time.sleep(0.3)
                         if not __isRunning:
                             continue
                         result=AK.setPitchRangeMoving(
