@@ -1,48 +1,3 @@
-sudo /etc/init.d/udev restart
-ls /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls /dev/video*
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo /etc/init.d/udev restart
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-sudo vim /etc/udev/rules.d/99-com.rules 
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
 ls -l /dev/video*
 sudo vim /etc/udev/rules.d/99-com.rules 
 sudo /etc/init.d/udev restart
@@ -1998,3 +1953,48 @@ clear
 sudo python QRcodeIdentify.py 
 clear
 sudo python ArmPi.py 
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+sudo python QRcodeIdentify.py 
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py >test.log
+clear
+sudo python ArmPi.py >test.log
+clear
+sudo python ArmPi.py >test.log
+clear
+sudo python ArmPi.py >test.log
+sudo python ArmPi.py
+sudo python ArmPi.py >test.log
+clear
+sudo python ArmPi.py >test.log
+clear
+sudo python ArmPi.py >test.log
+clear
+sudo python ArmPi.py
+clear
+git push origin2
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+sudo shutdown -h now
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py

@@ -98,7 +98,17 @@ start_pick_up = False  # 为true时抓取方块
 pick_up=False
 start_pick_down = False  # 为true时放置方块，均为false时恢复初始状态
 start_count_t1 = True
+num=0
 
+size = (640, 480)  # 设置采集图片(流)大小
+rotation_angle = 0
+unreachable = False  # 判断是否能够抓取
+reachtime = 0  # 抵达指定位置的时间
+catchtime = 0  # 抓取的时间
+text='null'
+state=0
+last_text='null'
+world_X, world_Y = 0, 0
 
 def reset():
     global _stop
@@ -109,7 +119,6 @@ def reset():
     global start_pick_up
     global start_pick_down
     global pick_up
-    global start_count_t1
     global z_r, z_g, z_b, z
 
     count = count = {'red':   0,
@@ -122,7 +131,6 @@ def reset():
     start_pick_up = False
     pick_up=False
     start_pick_down = False
-    start_count_t1 = True
     z_r = coordinate['red'][2]
     z_g = coordinate['green'][2]
     z_b = coordinate['blue'][2]
@@ -132,7 +140,6 @@ def reset():
 def init():
     print("QRSorting Init")
     initMove()
-
 
 def start():
     global __isRunning
@@ -157,21 +164,10 @@ def exit():
     print("QRSorting Exit")
 
 
-rect = None
-size = (640, 480)  # 设置采集图片(流)大小
-rotation_angle = 0
-unreachable = False  # 判断是否能够抓取
-reachtime = 0  # 抵达指定位置的时间
-catchtime = 0  # 抓取的时间
-text='null'
-last_text='0000'
-world_X, world_Y = 0, 0
+
 
 # 控制机械臂移动
-
-
 def move():
-    global rect
     global _stop
     global get_roi
     global move_square
@@ -190,13 +186,11 @@ def move():
     while True:
         if __isRunning:
             print("detect_color=%s" %(detect_color))
-            
             get_it=False
             count_num=0
             while not get_it:
-                
                 if detect_color != 'None' and start_pick_up:  
-                    # 如果抓取三次后还未抓取成功，则清空识别记录重新识别
+                    # 如果抓取2次后还未抓取成功，则清空识别记录重新识别
                     if count_num>1:
                         text='null'
                         start_pick_up=False
@@ -236,7 +230,7 @@ def move():
                         if not __isRunning:
                             continue
                         result=AK.setPitchRangeMoving(
-                            (world_X, world_Y, 1.5), -90, -90, 0, 1000)  # 降低高度到2cm
+                            (world_X, world_Y, 1.5), -90, -90, 0)  # 降低高度到2cm
                         time.sleep(result[2]/1000)
 
                         if not __isRunning:
@@ -305,6 +299,12 @@ def move():
                     #     (coordinate[detect_color][0], coordinate[detect_color][1], z), -90, -90, 0, 1000)
                     # AK.setPitchRangeMoving((coordinate[detect_color]), -90, -90, 0, 1000)
                     # time.sleep(0.8)
+                    if not __isRunning:
+                        continue
+                    #旋转角度放下
+                    servo2_angle = getAngle(coordinate[detect_color][0], coordinate[detect_color][1], -90)
+                    Board.setBusServoPulse(2, servo2_angle, 500)
+                    time.sleep(0.5)
 
                     if not __isRunning:
                         continue
@@ -453,8 +453,9 @@ def angle(a, R=10):
 
 
 def decodeDisplay(image):
-    # global last_text
+    global last_text
     barcodes = pyzbar.decode(image)
+    num=len(barcodes)
     data = []
     box=None
     rect=None
@@ -473,17 +474,14 @@ def decodeDisplay(image):
         if area > max_area:
             max_area = area
             max_barcode = barcode
-    print("max_area=%d"%max_area)
     # 如果找到了最大面积的二维码，则输出二维码信息和边框位置
     if max_barcode is not None:
         # 输出二维码信息
-        print(max_barcode.data.decode('utf-8'))
         # 找到二维码的最小边框位置
         rect = cv2.minAreaRect(np.array(max_barcode.polygon, np.int32))
         box = cv2.boxPoints(rect)
         box = np.int0(box)
     (x, y, w, h) = max_barcode.rect
-    print("x=%d"%(x)+" y=%d"%(y))
     barcodeData = max_barcode.data.decode("utf-8")
     data.append([x, y, w, h, barcodeData])
     return image,box,rect, data
@@ -498,34 +496,42 @@ def Heartbeat(alive):
     global start_pick_down
     global pick_up
     global text
-    print('func Heartbeat()',alive)
+    global state
+    # print('func Heartbeat()',alive)
     if text=='null':
+        state=0
         return (True,(0))
     elif alive:
         start_pick_up=True
+        state=1
         return (True,(1))
     elif pick_up:
+        state=3
         return (True,(3))
     elif start_pick_up:
         #抓取阶段
+        state=1
         return (True,(1))
     elif start_pick_down:
         #抓取结束放置阶段
+        state=2
         return (True,(2))
     else:
         #没有抓也没有放，但识别到
-        return (True,(1))
+        state=4
+        return (True,(4))
 
 def setTargetColor(target_color):
     global detect_color
     global text
+    global last_text
     global start_pick_up
     global start_pick_down
     print("func setTargetColor() started target_color=%s"%(target_color)+" text=%s"%(text))
     # RPC GetOrderId()方法
     if target_color=='double':
         #重复订单,重新识别
-        text='null'
+        last_text=text
         detect_color='None'
         start_pick_up=False
         start_pick_down=False
@@ -544,71 +550,7 @@ def setTargetColor(target_color):
         else:
             start_pick_down=False
         return (True, (text))
-
-""" def QRcode_sort():
-    print('func QRcode_sort() started')
-    global detect_color
-    global rotation_angle
-    global start_pick_up
-    global get_roi
-
-    init()
-    start()
-    my_camera = Camera.Camera()
-    my_camera.camera_open()
-    while True:
-        frame = my_camera.frame
-        if frame is not None:
-            img = frame.copy()
-            # 检测图像中的二维码内容,仅限一个
-            img, data = decodeDisplay(img)
-            my_camera.camera_close()
-            cv2.destroyAllWindows()
-            if len(data)!=0:
-                text = data[0][4]
-                # start_pick_up = True
-                print('return text')
-                return (True,(text))
-            else:
-                print('return None')
-                return (True,('None'))                    
-                    # if len(data) != 0:
-                        # 在frame上显示识别内容
-                        # text = data[0][4]
-                        # cv2.putText(frame, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,.5, (0, 0, 125), 2)
-                        # xx, yy = convertCoordinate(
-                        #     data[0][0], data[0][1], size)
-                        # print(xx, yy)
-                        # 检测到特定二维码内容时才会抓取
-                        # if data[0][4] == '000000004':
-                        #     detect_color = ('blue')
-                        #     start_pick_up = True
-                        #     # coordinate['blue'] = (xx+2, yy+5, 12)
-                        # elif data[0][4] == '100000020':
-                        #     detect_color = ('red')
-                        #     start_pick_up = True
-                        #     # coordinate['red'] = (xx+2, yy+5, 12)
-                        # elif data[0][4] == '000000003':
-                        #     detect_color = ('green')
-                        #     start_pick_up = True
-                        #     # coordinate['green'] = (xx+2, yy+5, 12)
-                        # else:
-                        #     detect_color = 'None'
-                        # return text
-                    # else:
-                    #     return 'None'
-
-            # img = run(img)
-            # cv2.imshow('frame', frame)
-            # key = cv2.waitKey(1)
-            # if key == 27:
-            #     break
-            # else:
-            #     my_camera.camera_close()
-            #     cv2.destroyAllWindows()
-            #     # 返回编号
-            #     # 如果采用预抓取则不需要返回方块位置
-            #     return 'None' """
+    
 def QRcode_sort_debug():
     print('func QRcode_sort() started')
     global detect_color
@@ -708,7 +650,6 @@ def QRcode_sort_debug():
                 # return 'None'
 
 def run(frame):
-    global rect
     global _stop
     global get_roi
     global move_square
@@ -717,23 +658,22 @@ def run(frame):
     global detect_color
     global count
     global text
+    global state
     global last_text
     global start_pick_up
     global rotation_angle
     global world_X, world_Y
     global z_r, z_g, z_b, z
-    print('func run() started text=',text)
+    print('func run() started text=%s'%(text)+' state=%d'%(state))
     if frame is not None:
         img=frame.copy()
     else:
         print("no frame")
         return
+    if text!='null':
+        return img
     # 检测图像中的二维码内容,仅限一个
-    if text=='null':
-        img,box, rect,data = decodeDisplay(img)
-    else:
-        rect=None
-        time.sleep(2)
+    img,box, rect,data = decodeDisplay(img)
     # 计算出二维码的位置和盒子位置
     if rect is not None:
         if box is not None:
@@ -746,15 +686,11 @@ def run(frame):
             world_X, world_Y = convertCoordinate(
                         img_centerx, img_centery, size)  # 转换为现实世界坐标
             print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
-            # 框出二维码或二维码部分
-            if len(data) != 0 and text=='null':
+            
+            if len(data) != 0 :
                 text = data[0][4]
-                while (last_text==text):
-                    img,box, rect,data = decodeDisplay(img)
-                    text = data[0][4]
-                    time.sleep(1)
-            last_text=text
-        return (True,("run "+text))
+            state=4
+    return img
         
 
 if __name__ == '__main__':
