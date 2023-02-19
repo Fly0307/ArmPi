@@ -376,11 +376,6 @@ def ColorPalletizing(*target_color):
 # 货物分拣——识别单号进行追踪分类
 
 # 识别抓取
-
-
-@dispatcher.add_method
-def CargoSorting():
-    return runbymainth(QRcodeIdentify.get_text, ())
 #心跳检测
 @dispatcher.add_method
 def ArmHeartbeat(alive):

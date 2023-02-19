@@ -46,9 +46,6 @@ coordinate = {
         'blue':  (-15 + 0.5, -6 - 0.5,  2),
     }
 
-__target_color = 'None'
-# 设置检测颜色
-
 
 # 夹持器夹取时闭合的角度
 servo1 = 500
@@ -56,10 +53,6 @@ servo1 = 500
 
 
 def initMove():
-    global count
-    count = {'red':   0,
-    'green': 0,
-    'blue':  0,}
     Board.setBusServoPulse(1, servo1 - 50, 300)
     Board.setBusServoPulse(2, 500, 500)
     AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
@@ -116,7 +109,6 @@ def reset():
     global start_pick_up
     global start_pick_down
     global pick_up
-    global __target_color
     global start_count_t1
     global z_r, z_g, z_b, z
 
@@ -126,7 +118,6 @@ def reset():
     _stop = False
     color_list = []
     get_roi = False
-    __target_color = 'None'
     detect_color = 'None'
     start_pick_up = False
     pick_up=False
@@ -173,6 +164,7 @@ unreachable = False  # 判断是否能够抓取
 reachtime = 0  # 抵达指定位置的时间
 catchtime = 0  # 抓取的时间
 text='null'
+last_text='0000'
 world_X, world_Y = 0, 0
 
 # 控制机械臂移动
@@ -186,7 +178,6 @@ def move():
     global __isRunning
     global unreachable
     global detect_color
-    global __target_color
     global count
     global text
     global start_pick_up
@@ -197,61 +188,36 @@ def move():
     global z_r, z_g, z_b, z
 
     while True:
-        # print("detect_color 1=%s" % detect_color)
         if __isRunning:
             print("detect_color=%s" %(detect_color))
-            if detect_color=='None':
-                time.sleep(1)
-                continue
-            # print(start_pick_up)
-            # 检测到特定二维码内容时才会抓取
-            # if text == '000000004':
-            #     detect_color = ('blue')
-            #     # start_pick_up = True
-            # elif text == '100000020':
-            #     detect_color = ('red')
-            #     # start_pick_up = True
-            # elif text == '000000003':
-            #     detect_color = ('green')
-            #     # start_pick_up = True
-            # else:
-            #     detect_color = 'None'
+            
             get_it=False
             count_num=0
             while not get_it:
                 
-                if detect_color != 'None' and start_pick_up:  # 如果检测到方块没有移动一段时间后，开始夹取
-                    if count_num>2:
+                if detect_color != 'None' and start_pick_up:  
+                    # 如果抓取三次后还未抓取成功，则清空识别记录重新识别
+                    if count_num>1:
                         text='null'
                         start_pick_up=False
                         start_pick_down=False
+                        detect_color = 'None'
                         initMove()
                         break
                     set_rgb(detect_color)
                     # setBuzzer(0.1)
-                    print("begin catch……")
-                    reachtime = 0.0
+                    # reachtime = 0.0
                     # 高度累加
                     print(detect_color)
-                    # z = coordinate[detect_color][2]
-                    # z_r += dz
-                    # if z == 2 * dz + coordinate['red'][2]:
-                    #     z_r = coordinate['red'][2]
-                    # if z == coordinate['red'][2]:
-                    #     move_square = True
-                    #     time.sleep(3)
-                    #     move_square = False
+
                     print("move to world_X=%d"%(world_X) +"and world_Y=%d"%(world_Y))
                     result = AK.setPitchRangeMoving(
-                        (world_X, world_Y, 7), -90, -90, 0)  # 移到目标位置，高度5cm
+                        (world_X, world_Y, 7), -90, -90, 0)  # 移到目标位置上方，高度5cm
                     if result == False:
                         unreachable = True
                     else:
                         unreachable = False
-                        reachtime += result[2]/1000
                         time.sleep(result[2]/1000)
-                        print("reachtime=%d"%(reachtime))
-
                         if not __isRunning:
                             continue
                         # 计算夹持器需要旋转的角度
@@ -262,7 +228,9 @@ def move():
                         if not __isRunning:
                             continue
                         result=AK.setPitchRangeMoving(
-                            (world_X, world_Y, 4), -90, -90, 0, 1000)  # 降低高度到4cm
+                            (world_X, world_Y, 5), -90, -90, 0)  # 降低高度到4cm
+                        if result == False:
+                            print("can't reach")
                         time.sleep(result[2]/1000)
                         Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
                         if not __isRunning:
@@ -279,16 +247,11 @@ def move():
                         if not __isRunning:
                             continue
                         Board.setBusServoPulse(2, 500, 500)
-                        AK.setPitchRangeMoving(
-                            (world_X, world_Y, 12), -90, -90, 0, 1000)  # 机械臂抬起
-                        time.sleep(1)
+                        result=AK.setPitchRangeMoving(
+                            (world_X, world_Y, 9), -90, -90, 0)  # 机械臂抬起
+                        time.sleep(result[2]/1000)
                         servo1_now=Board.getBusServoPulse(1)
                         print("servo1_now=%d"%servo1_now)
-                        
-                        #预运动到码垛区上方
-                        AK.setPitchRangeMoving(
-                            (0, 10, 12), -90, -90, 0, 1000)  # 机械臂抬起
-                        time.sleep(1)
                         #未夹取成功
                         if servo1_now>= 490:
                             print("don't get it")
@@ -297,20 +260,24 @@ def move():
                                 start_pick_up=False
                                 start_pick_down=False
                                 detect_color = 'None'
-                                __target_color='None'
                                 initMove()
                             continue
                         else: 
                             get_it=True
+                        result=AK.setPitchRangeMoving(
+                            (0, 10, 12), -90, -90, 0)  # 机械臂抬起
+                        time.sleep(result[2]/1000)
+
                         pick_up=True
                         start_pick_up=False
                         print("机械臂抬起")
                 else:
                     get_it=False
+            if detect_color=='None':
+                time.sleep(1)
+                continue
             put_it=False
             while (not put_it and text!='null'):
-                # if __target_color!='None':
-                #     detect_color=__target_color
                 if detect_color!='None'and start_pick_down:
                     print("机械臂开始放下 detect_color=%s"%(detect_color))
                     pick_up=False
@@ -322,13 +289,6 @@ def move():
                         (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0)
                     print(result)
                     time.sleep(result[2]/1000)
-
-                    # if not __isRunning:
-                    #     continue
-                    # servo2_angle = getAngle(
-                    #     coordinate[detect_color][0], coordinate[detect_color][1], -90)
-                    # Board.setBusServoPulse(2, servo2_angle, 500)
-                    # time.sleep(0.5)
 
                     if not __isRunning:
                         continue
@@ -361,9 +321,9 @@ def move():
                         (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 800)
                     time.sleep(0.8)
                     detect_color = 'None'
-                    __target_color='None'
                     get_roi = False
                     start_pick_up = False
+                    start_pick_down=False
                     text='null'
                     set_rgb(detect_color)
                     initMove()  # 回到初始位置
@@ -387,7 +347,7 @@ th = threading.Thread(target=move)
 th.setDaemon(True)
 th.start()
 
-# 识别处理图片
+""" # 识别处理图片
 def detect(image):
 
     # 读取图像并将其转化为灰度图片
@@ -467,7 +427,7 @@ def detect(image):
     # print(black_box)
     return box, rect, black_box
 
-
+ """
 def angle(a, R=10):
     x = 0.0
     y = 0.0
@@ -493,6 +453,7 @@ def angle(a, R=10):
 
 
 def decodeDisplay(image):
+    # global last_text
     barcodes = pyzbar.decode(image)
     data = []
     box=None
@@ -528,39 +489,7 @@ def decodeDisplay(image):
     return image,box,rect, data
 
 
-# def find_bar_code(box, rect, frame, data):
-#重新从图片检测绝对地址
-def get_worldposition():
-    global rect
-    global roi
-    global rotation_angle
-    global __target_color
-    global get_roi
-
-    if rect is not None:
-                # print(rect)
-                if box is not None:
-                    # 获取方块的现实世界坐标
-                    roi = getROI(box)  # 获取roi区域
-                    get_roi = True
-                    img_centerx, img_centery = getCenter(
-                        rect, roi, size, square_length)  # 获取木块中心坐标
-                    rotation_angle=rect[2]
-                    world_X, world_Y = convertCoordinate(
-                        img_centerx, img_centery, size)  # 转换为现实世界坐标
-                    print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
-                    # 框出二维码或二维码部分
-                    cv2.drawContours(frame, [box], -1, (0, 255, 0), 2)
-                    cv2.imshow('img', img)
-
 # target_color,暂时用颜色代替地址
-def get_text():
-    global __target_color
-    global text
-    global start_pick_up
-    global start_pick_down
-    print('func get_text() started')
-    return (True,(text))
 #心跳检测，用以返回当前机械臂状态
 # 0 未识别到数据  1抓取阶段
 # 2 放置阶段  3抓取悬空阶段
@@ -569,50 +498,42 @@ def Heartbeat(alive):
     global start_pick_down
     global pick_up
     global text
+    print('func Heartbeat()',alive)
     if text=='null':
         return (True,(0))
-    if alive:
+    elif alive:
         start_pick_up=True
         return (True,(1))
-    if pick_up:
+    elif pick_up:
         return (True,(3))
-    if start_pick_up:
+    elif start_pick_up:
+        #抓取阶段
         return (True,(1))
-    if start_pick_down:
+    elif start_pick_down:
+        #抓取结束放置阶段
         return (True,(2))
-
-
-
-# def setTargetColor(target_color):
-#     global __target_color
-#     global text
-#     global start_pick_up
-#     global start_pick_down
-#     print('func setTargetColor() started')
-#     if target_color=='None':
-#         return (True,(text))
-#     else:
-#         # print("COLOR", target_color)
-#         __target_color = target_color
-#         if text!='null':
-#             start_pick_down=True
-#         else:
-#             start_pick_down=False
-#         return (True, (text))
+    else:
+        #没有抓也没有放，但识别到
+        return (True,(1))
 
 def setTargetColor(target_color):
-    global __target_color
     global detect_color
     global text
     global start_pick_up
     global start_pick_down
     print("func setTargetColor() started target_color=%s"%(target_color)+" text=%s"%(text))
     # RPC GetOrderId()方法
+    if target_color=='double':
+        #重复订单,重新识别
+        text='null'
+        detect_color='None'
+        start_pick_up=False
+        start_pick_down=False
+        return (True,(text))
     if target_color=='None':
         return (True,(text))
     else:
         print("COLOR", target_color)
-        # __target_color = target_color
         if text!='null':
             start_pick_down=True
             if type(target_color) == tuple:
@@ -629,7 +550,6 @@ def setTargetColor(target_color):
     global detect_color
     global rotation_angle
     global start_pick_up
-    global __target_color
     global get_roi
 
     init()
@@ -650,7 +570,6 @@ def setTargetColor(target_color):
                 print('return text')
                 return (True,(text))
             else:
-                __target_color = 'None'
                 print('return None')
                 return (True,('None'))                    
                     # if len(data) != 0:
@@ -677,7 +596,6 @@ def setTargetColor(target_color):
                         #     detect_color = 'None'
                         # return text
                     # else:
-                    #     __target_color = 'None'
                     #     return 'None'
 
             # img = run(img)
@@ -698,7 +616,6 @@ def QRcode_sort_debug():
     global start_pick_up
     global start_pick_down
     global text
-    global __target_color
     global get_roi
     global world_X, world_Y
 
@@ -740,7 +657,6 @@ def QRcode_sort_debug():
                         print('return text')
                         # return (True,(text))
                     else:
-                        __target_color = 'None'
                         # print('return None')
                         # return (True,('None'))                    
                         if len(data) != 0:
@@ -769,16 +685,13 @@ def QRcode_sort_debug():
                             else:
                                 detect_color = 'None'
                             # return text
-                        else:
-                            __target_color = 'None'
-                            # return 'None'
+                        
             else:
                 if start_pick_up and not start_pick_down:
                     #画面中无二维码且未抓取到
                     text='null'
                     start_pick_up=False
                     start_pick_down=False
-
             # img = run(img)
             cv2.imshow('frame', frame)
             frame=None
@@ -794,7 +707,7 @@ def QRcode_sort_debug():
                 # 如果采用预抓取则不需要返回方块位置
                 # return 'None'
 
-def run(img):
+def run(frame):
     global rect
     global _stop
     global get_roi
@@ -802,29 +715,27 @@ def run(img):
     global __isRunning
     global unreachable
     global detect_color
-    global __target_color
     global count
     global text
+    global last_text
     global start_pick_up
     global rotation_angle
     global world_X, world_Y
     global z_r, z_g, z_b, z
-    print('func run() started')
-    # 检测图像中的二维码内容,仅限一个
+    print('func run() started text=',text)
+    if frame is not None:
+        img=frame.copy()
+    else:
+        print("no frame")
+        return
     # 检测图像中的二维码内容,仅限一个
     if text=='null':
         img,box, rect,data = decodeDisplay(img)
     else:
-        img=img
-        box=None
         rect=None
         time.sleep(2)
-    # img,box, rect, data = decodeDisplay(img)
     # 计算出二维码的位置和盒子位置
-    # box, rect, black_box = detect(img)
-
     if rect is not None:
-    # print(rect)
         if box is not None:
         # 获取方块的现实世界坐标
             roi = getROI(box)  # 获取roi区域
@@ -836,81 +747,16 @@ def run(img):
                         img_centerx, img_centery, size)  # 转换为现实世界坐标
             print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
             # 框出二维码或二维码部分
-            # cv2.drawContours(img, [box], -1, (0, 255, 0), 2)
-            # cv2.imshow('img', img)
             if len(data) != 0 and text=='null':
-            # 在frame上显示识别内容
                 text = data[0][4]
-                if text!='null':
-                    start_pick_up=True
-        else:
-            __target_color = 'None'
-        # print('func run() finished')s
+                while (last_text==text):
+                    img,box, rect,data = decodeDisplay(img)
+                    text = data[0][4]
+                    time.sleep(1)
+            last_text=text
         return (True,("run "+text))
         
 
 if __name__ == '__main__':
     print('func main() started')
     QRcode_sort_debug()
-    # init()
-    # start()
-    # my_camera = Camera.Camera()
-    # my_camera.camera_open()
-    # while True:
-    #     frame = my_camera.frame
-    #     if frame is not None:
-    #         img = frame.copy()
-    #         # 检测图像中的二维码内容,仅限一个
-    #         img, data = decodeDisplay(img)
-    #         # 计算出二维码的位置和盒子位置
-    #         box, rect, black_box = detect(img)
-
-    #         if rect is not None:
-    #             # print(rect)
-    #             if box is not None:
-    #                 # 获取方块的现实世界坐标
-    #                 roi = getROI(box)  # 获取roi区域
-    #                 get_roi = True
-
-    #                 img_centerx, img_centery = getCenter(
-    #                     rect, roi, size, square_length)  # 获取木块中心坐标
-    #                 rotation_angle=rect[2]
-    #                 world_X, world_Y = convertCoordinate(
-    #                     img_centerx, img_centery, size)  # 转换为现实世界坐标
-    #                 print("world_X= %d" % (world_X)+" world_Y=%d" % (world_Y))
-    #                 # 框出二维码或二维码部分
-    #                 cv2.drawContours(frame, [box], -1, (0, 255, 0), 2)
-    #                 cv2.imshow('img', img)
-    #                 if len(data) != 0:
-    #                     # 在frame上显示识别内容
-    #                     text = data[0][4]
-    #                     cv2.putText(frame, text, (data[0][0], data[0][1] - 10), cv2.FONT_HERSHEY_SIMPLEX,
-    #                                 .5, (0, 0, 125), 2)
-    #                     xx, yy = convertCoordinate(
-    #                         data[0][0], data[0][1], size)
-    #                     # print(xx, yy)
-    #                     # 检测到特定二维码内容时才会抓取
-    #                     if data[0][4] == '000000004':
-    #                         detect_color = ('blue')
-    #                         start_pick_up = True
-    #                         # coordinate['blue'] = (xx+2, yy+5, 12)
-    #                     elif data[0][4] == '100000020':
-    #                         detect_color = ('red')
-    #                         start_pick_up = True
-    #                         # coordinate['red'] = (xx+2, yy+5, 12)
-    #                     elif data[0][4] == '000000003':
-    #                         detect_color = ('green')
-    #                         start_pick_up = True
-    #                         # coordinate['green'] = (xx+2, yy+5, 12)
-    #                     else:
-    #                         detect_color = ('None')
-    #                 else:
-    #                     __target_color = ('None')
-
-    #         # img = run(img)
-    #         cv2.imshow('frame', frame)
-    #         key = cv2.waitKey(1)
-    #         if key == 27:
-    #             break
-    # my_camera.camera_close()
-    # cv2.destroyAllWindows()
