@@ -55,7 +55,7 @@ servo1 = 500
 def initMove():
     Board.setBusServoPulse(1, servo1 - 50, 300)
     Board.setBusServoPulse(2, 500, 500)
-    AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 1500)
+    AK.setPitchRangeMoving((0, 10, 10), -30, -30, -90, 500)
 
 
 def setBuzzer(timer):
@@ -206,7 +206,7 @@ def move():
 
                     print("move to world_X=%d"%(world_X) +"and world_Y=%d"%(world_Y))
                     result = AK.setPitchRangeMoving(
-                        (world_X, world_Y, 7), -90, -90, 0)  # 移到目标位置上方，高度5cm
+                        (world_X, world_Y, 7), -90, -90, 0,500)  # 移到目标位置上方，高度5cm
                     if result == False:
                         unreachable = True
                     else:
@@ -222,28 +222,28 @@ def move():
                         if not __isRunning:
                             continue
                         result=AK.setPitchRangeMoving(
-                            (world_X, world_Y, 5), -90, -90, 0)  # 降低高度到4cm
+                            (world_X, world_Y, 5), -90, -90, 0,300)  # 降低高度到4cm
                         if result == False:
                             print("can't reach")
                         time.sleep(result[2]/1000)
-                        Board.setBusServoPulse(1, servo1 - 280, 500)  # 爪子张开
+                        Board.setBusServoPulse(1, servo1 - 280, 300)  # 爪子张开
                         time.sleep(0.3)
                         if not __isRunning:
                             continue
                         result=AK.setPitchRangeMoving(
-                            (world_X, world_Y, 1.5), -90, -90, 0)  # 降低高度到2cm
+                            (world_X, world_Y, 1.5), -90, -90, 0,300)  # 降低高度到2cm
                         time.sleep(result[2]/1000)
 
                         if not __isRunning:
                             continue
-                        Board.setBusServoPulse(1, servo1, 500)  # 夹持器闭合
-                        time.sleep(0.8)
+                        Board.setBusServoPulse(1, servo1, 300)  # 夹持器闭合
+                        time.sleep(0.3)
 
                         if not __isRunning:
                             continue
-                        Board.setBusServoPulse(2, 500, 500)
+                        Board.setBusServoPulse(2, 500, 300)
                         result=AK.setPitchRangeMoving(
-                            (world_X, world_Y, 9), -90, -90, 0)  # 机械臂抬起
+                            (world_X, world_Y, 9), -90, -90, 0,400)  # 机械臂抬起
                         time.sleep(result[2]/1000)
                         servo1_now=Board.getBusServoPulse(1)
                         print("servo1_now=%d"%servo1_now)
@@ -260,7 +260,7 @@ def move():
                         else: 
                             get_it=True
                         result=AK.setPitchRangeMoving(
-                            (0, 10, 12), -90, -90, 0)  # 机械臂抬起
+                            (0, 10, 12), -90, -90, 0,400)  # 机械臂抬起
                         time.sleep(result[2]/1000)
 
                         pick_up=True
@@ -281,14 +281,14 @@ def move():
                         continue
                     print(detect_color)
                     result=AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0)
+                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0,400)
                     print(result)
                     time.sleep(result[2]/1000)
 
                     if not __isRunning:
                         continue
                     result=AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], coordinate[detect_color][2]+count[detect_color]), -90, -90, 0)
+                        (coordinate[detect_color][0], coordinate[detect_color][1], coordinate[detect_color][2]+count[detect_color]), -90, -90, 0,400)
                     print(result)
                     if not result:
                         continue
@@ -304,23 +304,23 @@ def move():
                         continue
                     #旋转角度放下
                     servo2_angle = getAngle(coordinate[detect_color][0], coordinate[detect_color][1], -90)
-                    Board.setBusServoPulse(2, servo2_angle, 500)
-                    time.sleep(0.5)
+                    Board.setBusServoPulse(2, servo2_angle, 300)
+                    time.sleep(0.3)
 
                     if not __isRunning:
                         continue
-                    Board.setBusServoPulse(1, servo1 - 200, 500)  # 爪子张开  ，放下物体
+                    Board.setBusServoPulse(1, servo1 - 200, 300)  # 爪子张开  ，放下物体
                     put_it=True
                     n=count[detect_color]
                     count[detect_color]=n+1
                     print("num %s"%(detect_color)+"=%d"%(n+1))
-                    time.sleep(1)
+                    time.sleep(0.3)
 
                     if not __isRunning:
                         continue
-                    AK.setPitchRangeMoving(
-                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0, 800)
-                    time.sleep(0.8)
+                    result=AK.setPitchRangeMoving(
+                        (coordinate[detect_color][0], coordinate[detect_color][1], 12), -90, -90, 0,500)
+                    time.sleep(result[2]/1000)
                     detect_color = 'None'
                     get_roi = False
                     start_pick_up = False
@@ -692,7 +692,6 @@ def run(frame):
                 text = data[0][4]
             state=4
     return img
-        
 
 if __name__ == '__main__':
     print('func main() started')

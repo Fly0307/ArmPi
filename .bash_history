@@ -1,21 +1,3 @@
-ls -l /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls -l /dev/video*
-cd ArmPi_PC_Software_v1.0/
-ls
-ls /dev/video*
-ls
-ls /dev/video*
-sudo vim ArmPi.py 
-python3 ArmPi.py 
-sudo vim ArmPi.py 
-python3 ArmPi.py 
-sudo vim ArmPi.py 
-python3 ArmPi.py 
-sudo vim ArmPi.py 
-python3 ArmPi.py 
-sudo vim ArmPi.py 
 python3 ArmPi.py 
 sudo vim ArmPi.py 
 python3 ArmPi.py 
@@ -1998,3 +1980,21 @@ clear
 sudo python ArmPi.py
 clear
 sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+top
+sudo python ArmPi.py
+sudo reboot
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
