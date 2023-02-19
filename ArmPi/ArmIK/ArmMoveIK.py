@@ -107,6 +107,7 @@ class ArmIK:
         #alpha为给定俯仰角
         #alpha1和alpha2为俯仰角的取值范围
         #movetime为舵机转动时间，单位ms, 如果不给出时间，则自动计算
+        print(coordinate_data)
         x, y, z = coordinate_data
         result1 = self.setPitchRange((x, y, z), alpha, alpha1)
         result2 = self.setPitchRange((x, y, z), alpha, alpha2)

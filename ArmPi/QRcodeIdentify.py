@@ -712,17 +712,17 @@ def QRcode_sort_debug():
                             # print(xx, yy)
                             # 检测到特定二维码内容时才会抓取
                             if data[0][4] == '000000004' or data[0][4]=='000000019':
-                                detect_color = ('blue')
+                                detect_color = 'blue'
                                 start_pick_up = True
                                 start_pick_down=True
                                 # coordinate['blue'] = (xx+2, yy+5, 12)
                             elif data[0][4] == '100000020' or data[0][4]=='000000009':
-                                detect_color = ('red')
+                                detect_color = 'red'
                                 start_pick_up = True
                                 start_pick_down=True
                                 # coordinate['red'] = (xx+2, yy+5, 12)
                             elif data[0][4] == '000000003'or data[0][4]=='000000005':
-                                detect_color = ('green')
+                                detect_color = 'green'
                                 start_pick_up = True
                                 start_pick_down=True
                                 # coordinate['green'] = (xx+2, yy+5, 12)

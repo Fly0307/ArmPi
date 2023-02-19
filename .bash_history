@@ -1,42 +1,4 @@
 ls /dev/video*
-sudo udevadm info --query=all --name=/dev/video1
-sudo vim /etc/udev/rules.d/
-cd /etc/udev/
-ls
-cd rules.d/
-ls
-vim 99-com.rules 
-vim 99-myvideo.rules
-sudo vim 99-myvideo.rules
-sudo vim 99-myvideo.rules 
-sudo reboot 
-ls /dev/
-ls -l /dev/
-lsusb
-vim /etc/udev/rules.d/99-com.rules 
-sudo udevadm info /dev/video0
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo reboot 
-ls /dev/myvideo*
-ls /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo rm /etc/udev/rules.d/99-myvideo.rules 
-sudo /etc/init.d/udev resatrt
-sudo /etc/init.d/udev restart
-ls /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls /dev/video*
-sudo reboot 
-lsusb
-ls /dev/video*
-sudo halt 
-ls /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-sudo /etc/init.d/udev restart
-ls /dev/video*
-sudo vim /etc/udev/rules.d/99-com.rules 
-ls /dev/video*
 sudo vim /etc/udev/rules.d/99-com.rules 
 ls /dev/video*
 sudo /etc/init.d/udev restart
@@ -1982,6 +1944,7 @@ sudo python ArmPi.py
 clear
 sudo python ArmPi.py 
 sudo python ArmPi.py
+<<<<<<< HEAD
 ls
 clear
 ls
@@ -1997,4 +1960,41 @@ sudo python ArmPi.py
 sudo python QRcodeIdentify.py
 clear
 sudo python QRcodeIdentify.py
+clear
+sudo python QRcodeIdentify.py
+sudo python ArmPi.py 
+sudo python ArmPi.py > test.log
+sudo python ArmPi.py 
+sudo python ArmPi.py \
+sudo python ArmPi.py
+sudo shutdown -h now
+git log
+clear
+git push origin2
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+clear
+sudo python ArmPi.py
+sudo python ArmPi.py >test.log
+clear
+sudo python ArmPi.py
+clear
+sudo reboot
+sudo python ArmPi.py
+clear
+sudo python QRcodeIdentify.py 
+clear
+sudo python ArmPi.py
+sudo shutdown -h now
+=======
+>>>>>>> parent of ba98227... 重新优化单机上对二维码识别和抓取，主要解决多二维码识别无法选取目标bug，但有放置更新不及时bug
+sudo python QRcodeIdentify.py
+sudo python ArmPi.py
+git log
+sudo git reset ba98
+git log
 clear
